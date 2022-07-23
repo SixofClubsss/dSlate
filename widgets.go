@@ -15,7 +15,7 @@ var dropDown = widget.NewSelect(primes, func(s string) {           /// do when s
 	log.Println("Daemon Set To:", s)
 })
 
-var rpcLoginInput = widget.NewPasswordEntry()
+var rpcLoginInput = widget.NewPasswordEntry() /// declare some widgets
 var rpcWalletInput = widget.NewEntry()
 var contractInput = widget.NewEntry()
 var display = widget.NewLabel("")
@@ -29,6 +29,7 @@ var walletCheckBox = widget.NewCheck("Wallet Connected", func(value bool) {
 })
 
 var currentHeight = widget.NewEntry()
+var walletBalance = widget.NewEntry()
 
 func rpcLoginEdit() fyne.Widget { /// user:pass password entry
 	rpcLoginInput.SetPlaceHolder("Enter user:pass")
@@ -47,7 +48,7 @@ func rpcWalletEdit() fyne.Widget { /// wallet rpc address entry
 }
 
 func rpcConnectButton() fyne.Widget { /// wallet connect button
-	button := widget.NewButton("Connect", func() {
+	button := widget.NewButton("Connect", func() { /// do on pressed
 		log.Println("Connect Pressed")
 		pre := "http://"
 		suff := "/json_rpc"
@@ -62,7 +63,7 @@ func rpcConnectButton() fyne.Widget { /// wallet connect button
 
 func daemonSelectOption() fyne.Widget { /// daemon select menu
 	dropDown.SetSelectedIndex(0)
-	dropDown.Resize(fyne.NewSize(360, 45))
+	dropDown.Resize(fyne.NewSize(180, 45))
 	dropDown.Move(fyne.NewPos(10, 550))
 
 	return dropDown
@@ -88,9 +89,19 @@ func heightDisplay() fyne.Widget { /// height display entry is read only
 	currentHeight.SetText("Height:")
 	currentHeight.Disable()
 	currentHeight.Resize(fyne.NewSize(170, 45))
-	currentHeight.Move(fyne.NewPos(200, 600))
+	currentHeight.Move(fyne.NewPos(200, 550))
 
 	return currentHeight
+
+}
+
+func balanceDisplay() fyne.Widget {
+	walletBalance.SetText("Balance:")
+	walletBalance.Disable()
+	walletBalance.Resize(fyne.NewSize(170, 45))
+	walletBalance.Move(fyne.NewPos(200, 600))
+
+	return walletBalance
 
 }
 
@@ -125,7 +136,16 @@ func searchButton() fyne.Widget { /// SC search button
 	return button
 }
 
-func image() fyne.CanvasObject { /// card image
+func builtOnImage() fyne.CanvasObject { ///  main image
+	img := canvas.NewImageFromResource(resourceBuiltOnDeroPng)
+	img.FillMode = canvas.ImageFillOriginal
+	img.Resize(fyne.NewSize(360, 430))
+	img.Move(fyne.NewPos(10, 210))
+
+	return img
+}
+
+func cardImage() fyne.CanvasObject { /// card image
 	img := canvas.NewImageFromResource(resourceDero1Png)
 	img.FillMode = canvas.ImageFillOriginal
 	img.Resize(fyne.NewSize(450, 330))

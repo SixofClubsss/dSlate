@@ -31,10 +31,10 @@ func main() {
 		myWindow.Close()
 	})
 	/// organize content
-	settingsContent := container.NewWithoutLayout(rpcWalletEdit(), rpcLoginEdit(), rpcConnectButton(), daemonSelectOption(), daemonConnectBox(), walletConnectBox(), heightDisplay())
+	settingsContent := container.NewWithoutLayout(rpcWalletEdit(), rpcLoginEdit(), rpcConnectButton(), daemonSelectOption(), daemonConnectBox(), walletConnectBox(), heightDisplay(), balanceDisplay(), builtOnImage())
 	searchContent := container.NewWithoutLayout(searchButton(), contractEdit())
 	scroll := container.NewScroll(searchContent)
-	imageContent := container.NewWithoutLayout(image())
+	imageContent := container.NewWithoutLayout(cardImage())
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Settings", settingsContent),
 		container.NewTabItem("Search", scroll),

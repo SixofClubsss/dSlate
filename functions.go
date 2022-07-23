@@ -46,6 +46,7 @@ func isWalletConnected() { /// check if wallet is connected
 			fmt.Println("Wallet Connected")
 			walletCheckBox.SetChecked(true)
 		}
+		GetBalance()
 
 	} else {
 		fmt.Println("Wallet Not Connected")
@@ -58,6 +59,7 @@ func isWalletConnected() { /// check if wallet is connected
 	if walletCheckBox.Checked { /// if wallet is connected and any changes to inputs, show disconnected
 		checkPass()
 		if pre+rpcWalletInput.Text+suff != walletAddress {
+			walletBalance.SetText("Balance: ")
 			walletAddress = ""
 			walletCheckBox.SetChecked(false)
 			walletConnectBool = false
@@ -71,6 +73,7 @@ func checkPass() { /// check if user:pass has changed
 	hash := sha256.Sum256(data)
 
 	if hash != passHash {
+		walletBalance.SetText("Balance: ")
 		walletCheckBox.SetChecked(false)
 		walletConnectBool = false
 	}
