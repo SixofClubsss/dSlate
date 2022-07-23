@@ -13,8 +13,13 @@ Users can connect to Mainnet, Testnet, Simulator or Custom daemon addresses. It 
 
 ![dSlateMain](https://user-images.githubusercontent.com/84689659/180616347-9567d87e-7444-44a8-b4d2-0078357bd1a9.png)
 
+--- 
+
 ### Instructions
 - Install latest [Go version](https://go.dev/doc/install)
 - Run `go install github.com/SixofClubsss/dSlate@latest`
 - Move to bin in go workspace `cd go/bin`
 - Start dSlate with `./dSlate`
+- Check out [Fyne's developer guide](https://developer.fyne.io/) and have some fun creating!
+
+---
