@@ -16,7 +16,7 @@ var passHash [32]byte
 
 const (
 	WALLET_MAINNET_DEFAULT   = "http://127.0.0.1:10103/json_rpc"
-	WALLET_TESTNET_DEFAULT   = "http://127.0.0.1:40103/json_rpc"
+	WALLET_TESTNET_DEFAULT   = "http://127.0.0.1:40403/json_rpc"
 	WALLET_SIMULATOR_DEFAULT = "http://127.0.0.1:30000/json_rpc"
 )
 

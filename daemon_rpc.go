@@ -13,7 +13,7 @@ import (
 
 const (
 	DAEMON_MAINNET_DEFAULT   = "http://127.0.0.1:10102/json_rpc"
-	DAEMON_TESTNET_DEFAULT   = "http://127.0.0.1:40102/json_rpc"
+	DAEMON_TESTNET_DEFAULT   = "http://127.0.0.1:40402/json_rpc"
 	DAEMON_SIMULATOR_DEFAULT = "http://127.0.0.1:20000/json_rpc"
 )
 
