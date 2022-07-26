@@ -15,6 +15,8 @@ var quit chan struct{}
 var daemonAddress string
 var walletAddress string
 
+var imageContent fyne.Container /// made global
+
 const (
 	MIN_WIDTH  = 380
 	MIN_HEIGHT = 800
@@ -34,12 +36,12 @@ func main() {
 	settingsContent := container.NewWithoutLayout(rpcWalletEdit(), rpcLoginEdit(), rpcConnectButton(), daemonSelectOption(), daemonConnectBox(), walletConnectBox(), heightDisplay(), balanceDisplay(), builtOnImage())
 	searchContent := container.NewWithoutLayout(searchButton(), contractEdit())
 	scroll := container.NewScroll(searchContent)
-	imageContent := container.NewWithoutLayout(cardImage())
+	imageContent = *container.NewWithoutLayout(cardImage1(0), cardImage2(0), dealButton(), clearButton())
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Settings", settingsContent),
 		container.NewTabItem("Search", scroll),
 		container.NewTabItem("Blank Slate", blankWidget()),
-		container.NewTabItem("?", imageContent),
+		container.NewTabItem("?", &imageContent),
 	)
 	/// start looking and set content
 	fetchLoop()
@@ -60,6 +62,8 @@ func fetchLoop() { /// ping daemon and get height loop
 				isDaemonConnected()
 				isWalletConnected()
 				GetHeight()
+				getSC_ex1()
+				imageContent = *container.NewWithoutLayout(cardImage1(card1), cardImage2(card2), dealButton(), clearButton())
 			case <-quit: /// exit loop
 				fmt.Println("Exiting...")
 				ticker.Stop()

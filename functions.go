@@ -3,6 +3,8 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+
+	"fyne.io/fyne/v2"
 )
 
 const (
@@ -77,4 +79,30 @@ func checkPass() { /// check if user:pass has changed
 		walletCheckBox.SetChecked(false)
 		walletConnectBool = false
 	}
+}
+
+func displayCard(c int) fyne.Resource {
+	switch c {
+	case 1:
+		return resourceDero1Png
+	case 2:
+		return resourceDero2Png
+	case 3:
+		return resourceDero3Png
+	case 4:
+		return resourceDero4Png
+	case 5:
+		return resourceDero5Png
+	case 6:
+		return resourceDero6Png
+	case 7:
+		return resourceDero7Png
+	case 8:
+		return resourceDero8Png
+	case 9:
+		return resourceDero9Png
+	default:
+		return resourceDero0Png
+	}
+
 }

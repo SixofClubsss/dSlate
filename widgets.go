@@ -145,11 +145,48 @@ func builtOnImage() fyne.CanvasObject { ///  main image
 	return img
 }
 
-func cardImage() fyne.CanvasObject { /// card image
-	img := canvas.NewImageFromResource(resourceDero1Png)
+func dealButton() fyne.Widget { /// wallet connect button
+	button := widget.NewButton("Deal", func() { /// do on pressed
+		log.Println("Deal Pressed")
+		pre := "http://"
+		suff := "/json_rpc"
+		walletAddress = pre + rpcWalletInput.Text + suff
+		Deal()
+	})
+	button.Resize(fyne.NewSize(100, 42))
+	button.Move(fyne.NewPos(270, 702))
+
+	return button
+}
+
+func clearButton() fyne.Widget { /// wallet connect button
+	button := widget.NewButton("Clear", func() { /// do on pressed
+		log.Println("Clear Pressed")
+		pre := "http://"
+		suff := "/json_rpc"
+		walletAddress = pre + rpcWalletInput.Text + suff
+		Clear()
+	})
+	button.Resize(fyne.NewSize(100, 42))
+	button.Move(fyne.NewPos(10, 702))
+
+	return button
+}
+
+func cardImage1(card int) fyne.CanvasObject { /// top card image
+	img := canvas.NewImageFromResource(displayCard(card))
 	img.FillMode = canvas.ImageFillOriginal
 	img.Resize(fyne.NewSize(450, 330))
-	img.Move(fyne.NewPos(-33, 200))
+	img.Move(fyne.NewPos(-33, 15))
+
+	return img
+}
+
+func cardImage2(card int) fyne.CanvasObject { /// bottom card image
+	img := canvas.NewImageFromResource(displayCard(card))
+	img.FillMode = canvas.ImageFillOriginal
+	img.Resize(fyne.NewSize(450, 330))
+	img.Move(fyne.NewPos(-33, 365))
 
 	return img
 }

@@ -77,3 +77,53 @@ func GetBalance() error { /// get wallet balance
 
 	return err
 }
+
+func Deal() error { /// deal cards
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	defer cancel()
+	rpcClientW = jsonrpc.NewClientWithOpts(walletAddress, &jsonrpc.RPCClientOpts{
+		CustomHeaders: map[string]string{
+			"Authorization": "Basic " + base64.StdEncoding.EncodeToString([]byte(rpcLoginInput.Text)),
+		},
+	})
+	a := rpc.Argument{Name: "entrypoint", DataType: "S", Value: "Deal"}
+	b := rpc.Arguments{a}
+	p := &rpc.SC_Invoke_Params{
+		SC_ID:    "c8b015cffe9dccec02541792e6142ac3dca9b66392315525ad34a9f4df8d65d9",
+		SC_RPC:   b,
+		Ringsize: 2,
+	}
+	err := rpcClientW.CallFor(ctx, &a, "scinvoke", p)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return err
+}
+
+func Clear() error { /// clear cards
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	defer cancel()
+	rpcClientW = jsonrpc.NewClientWithOpts(walletAddress, &jsonrpc.RPCClientOpts{
+		CustomHeaders: map[string]string{
+			"Authorization": "Basic " + base64.StdEncoding.EncodeToString([]byte(rpcLoginInput.Text)),
+		},
+	})
+	a := rpc.Argument{Name: "entrypoint", DataType: "S", Value: "ClearCards"}
+	b := rpc.Arguments{a}
+	p := &rpc.SC_Invoke_Params{
+		SC_ID:    "c8b015cffe9dccec02541792e6142ac3dca9b66392315525ad34a9f4df8d65d9",
+		SC_RPC:   b,
+		Ringsize: 2,
+	}
+	err := rpcClientW.CallFor(ctx, &a, "scinvoke", p)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return err
+}
