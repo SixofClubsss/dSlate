@@ -2,70 +2,63 @@ package main
 
 import (
 	"crypto/sha256"
-	"fmt"
-)
-
-const (
-	pre  = "http://"
-	suff = "/json_rpc"
+	"log"
 )
 
 func whichDaemon(s string) { /// select menu changes dameon address
 	switch s {
 	case "TESTNET":
-		daemonAddress = pre + "127.0.0.1:40102" + suff
+		daemonAddress = "127.0.0.1:40102"
 	case "SIMULATOR":
-		daemonAddress = pre + "127.0.0.1:20000" + suff
+		daemonAddress = "127.0.0.1:20000"
 	case "CUSTOM":
 		confirmPopUp() /// enter custom address in new window
 	default:
-		daemonAddress = pre + "127.0.0.1:10102" + suff
+		daemonAddress = "127.0.0.1:10102"
 	}
 }
 
 func isDaemonConnected() { /// check if daemon is connected
-	if daemonConnectBool {
+	if daemonConnect {
 		if !daemonCheckBox.Checked {
-			fmt.Println("Daemon Connected")
+			log.Println("Daemon Connected")
 		}
 		daemonCheckBox.SetChecked(true)
 	} else {
-		fmt.Println("Daemon Not Connected")
+		log.Println("Daemon Not Connected")
 		currentHeight.SetText("Height:")
 		if daemonCheckBox.Checked {
 			daemonCheckBox.SetChecked(false)
 		}
 
 	}
-
 }
 
 func isWalletConnected() { /// check if wallet is connected
-	if walletConnectBool {
+	if walletConnect {
 		if !walletCheckBox.Checked {
-			fmt.Println("Wallet Connected")
+			log.Println("Wallet Connected")
 			walletCheckBox.SetChecked(true)
 		}
 		GetBalance()
 
 	} else {
-		fmt.Println("Wallet Not Connected")
+		log.Println("Wallet Not Connected")
 		if walletCheckBox.Checked {
 			walletCheckBox.SetChecked(false)
-			walletConnectBool = false
+			walletConnect = false
 		}
 	}
 
 	if walletCheckBox.Checked { /// if wallet is connected and any changes to inputs, show disconnected
 		checkPass()
-		if pre+rpcWalletInput.Text+suff != walletAddress {
+		if rpcWalletInput.Text != walletAddress {
 			walletBalance.SetText("Balance: ")
 			walletAddress = ""
 			walletCheckBox.SetChecked(false)
-			walletConnectBool = false
+			walletConnect = false
 		}
 	}
-
 }
 
 func checkPass() { /// check if user:pass has changed
@@ -75,6 +68,6 @@ func checkPass() { /// check if user:pass has changed
 	if hash != passHash {
 		walletBalance.SetText("Balance: ")
 		walletCheckBox.SetChecked(false)
-		walletConnectBool = false
+		walletConnect = false
 	}
 }

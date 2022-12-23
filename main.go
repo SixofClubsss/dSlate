@@ -2,22 +2,25 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
 )
-
-var myApp = app.New()
-var myWindow fyne.Window
-var quit chan struct{}
-var daemonAddress string
-var walletAddress string
 
 const (
 	MIN_WIDTH  = 380
 	MIN_HEIGHT = 800
+)
+
+var (
+	myApp    = app.New()
+	myWindow fyne.Window
+	quit     chan struct{}
 )
 
 func main() {
@@ -30,23 +33,23 @@ func main() {
 		stopLoop()
 		myWindow.Close()
 	})
-	/// organize content
-	settingsContent := container.NewWithoutLayout(rpcWalletEdit(), rpcLoginEdit(), rpcConnectButton(), daemonSelectOption(), daemonConnectBox(), walletConnectBox(), heightDisplay(), balanceDisplay(), builtOnImage())
-	searchContent := container.NewWithoutLayout(searchButton(), contractEdit())
-	scroll := container.NewScroll(searchContent)
-	imageContent := container.NewWithoutLayout(cardImage())
-	tabs := container.NewAppTabs(
-		container.NewTabItem("Settings", settingsContent),
-		container.NewTabItem("Search", scroll),
-		container.NewTabItem("Blank Slate", blankWidget()),
-		container.NewTabItem("?", imageContent),
-	)
+
 	/// start looking and set content
 	fetchLoop()
-	tabs.SetTabLocation(container.TabLocationTop)
-	myWindow.SetContent(tabs)
+	myWindow.SetContent(placeWith())
 	myWindow.ShowAndRun()
 
+}
+
+func init() { /// Handle ctrl-c close
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		stopLoop()
+		fmt.Println()
+		os.Exit(1)
+	}()
 }
 
 func fetchLoop() { /// ping daemon and get height loop
@@ -60,8 +63,11 @@ func fetchLoop() { /// ping daemon and get height loop
 				isDaemonConnected()
 				isWalletConnected()
 				GetHeight()
+				if Gnomes.Init {
+					Gnomes.Indexer.Endpoint = daemonAddress
+				}
 			case <-quit: /// exit loop
-				fmt.Println("Exiting...")
+				log.Println("Exiting...")
 				ticker.Stop()
 				return
 			}

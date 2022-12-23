@@ -1,90 +1,135 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
+	"log"
+	"sort"
 	"strconv"
-	"time"
 
-	"github.com/deroproject/derohe/rpc"
-	"github.com/ybbus/jsonrpc/v3"
+	"github.com/SixofClubsss/dReams/rpc"
+	dero "github.com/deroproject/derohe/rpc"
 )
 
 const (
-	DAEMON_MAINNET_DEFAULT   = "http://127.0.0.1:10102/json_rpc"
-	DAEMON_TESTNET_DEFAULT   = "http://127.0.0.1:40402/json_rpc"
-	DAEMON_SIMULATOR_DEFAULT = "http://127.0.0.1:20000/json_rpc"
+	DAEMON_MAINNET_DEFAULT   = "127.0.0.1:10102"
+	DAEMON_TESTNET_DEFAULT   = "127.0.0.1:40402"
+	DAEMON_SIMULATOR_DEFAULT = "127.0.0.1:20000"
 )
 
-var rpcClientD = jsonrpc.NewClient(DAEMON_MAINNET_DEFAULT) /// daemon default to mainnet
-
-var daemonConnectBool bool
+var (
+	daemonAddress string
+	daemonConnect bool
+)
 
 func Ping() error { /// ping blockchain for connection
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
 	defer cancel()
-	rpcClientD = jsonrpc.NewClient(daemonAddress)
+
 	var result string
 	err := rpcClientD.CallFor(ctx, &result, "DERO.Ping")
 	if err != nil {
-		daemonConnectBool = false
+		daemonConnect = false
 		return nil
 	}
 
 	if result == "Pong " {
-		daemonConnectBool = true
+		daemonConnect = true
 	} else {
-		daemonConnectBool = false
+		daemonConnect = false
 	}
 
 	return err
 }
 
 func GetHeight() error { /// get current height and displays
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
 	defer cancel()
-	rpcClientD = jsonrpc.NewClient(daemonAddress)
-	var result *rpc.Daemon_GetHeight_Result
+
+	var result *dero.Daemon_GetHeight_Result
 	err := rpcClientD.CallFor(ctx, &result, "DERO.GetHeight")
 
 	if err != nil {
 		return nil
 	}
 	h := result.Height
-	fmt.Printf("Daemon Height: %d \n", h)
-	str := strconv.FormatUint(result.Height, 10)
+	log.Printf("Daemon Height: %d \n", h)
+	str := strconv.FormatUint(h, 10)
 	currentHeight.SetText("Height: " + str)
 
 	return err
-
 }
 
-func getSC(p *rpc.GetSC_Params) error { /// search sc using getsc method
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+func getSC(p *dero.GetSC_Params) error { /// search sc using getsc method
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
 	defer cancel()
-	rpcClientD := jsonrpc.NewClient(daemonAddress)
-	var result *rpc.GetSC_Result
+
+	var result *dero.GetSC_Result
 	err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", p)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil
 	}
 
-	bal := result.Balances /// retrieve sc balances
+	bal := result.Balances /// retrieve all sc balances
 	balM, _ := json.Marshal(bal)
-	strB := string(balM)
+	balances := string(balM)
 
-	sKeys := result.VariableStringKeys /// retrieve sc string keys
-	sKeysM, _ := json.Marshal(sKeys)
-	strK := string(sKeysM)
+	string_keys := SortStringMap(result.VariableStringKeys) /// retrieve all sc string keys, use result.VariableStringKeys["KEY"] for single value
 
-	uintKeys := result.VariableUint64Keys /// retrieve sc uint keys
-	uintKeysM, _ := json.Marshal(uintKeys)
-	uintK := string(uintKeysM)
+	uint_keys := SortUintMap(result.VariableUint64Keys) /// retrieve all sc uint keys use result.VariableUint64Keys[0] for single value
 
-	searchPopUp(strB, strK, uintK, result.Code) /// displays results
+	go searchPopUp(balances, string_keys, uint_keys, result.Code) /// displays results
 
 	return err
+}
+
+func findKey(i interface{}) (text string) {
+	switch v := i.(type) {
+	case uint64:
+		text = strconv.Itoa(int(v))
+	case string:
+		text = v
+	case float64:
+		text = strconv.Itoa(int(v))
+	default:
+
+	}
+
+	return
+}
+
+func SortStringMap(m map[string]interface{}) (str string) {
+	keys := make([]string, 0, len(m))
+
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		if m[k] == m["C"] {
+			/// skipping C
+		} else {
+			str = str + k + " " + findKey(m[k]) + " \n"
+		}
+	}
+
+	return
+}
+
+func SortUintMap(m map[uint64]interface{}) (str string) {
+	keys := make([]uint64, 0, len(m))
+
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
+
+	for _, k := range keys {
+		str = str + strconv.Itoa(int(k)) + " " + findKey(m[k]) + " \n"
+
+	}
+
+	return
 }
