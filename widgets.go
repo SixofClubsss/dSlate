@@ -342,7 +342,7 @@ func nfaOpts() fyne.CanvasObject {
 						}
 
 						log.Println("[dSlate] Waiting for block")
-						time.Sleep(10 * time.Second)
+						time.Sleep(36 * time.Second)
 					}
 
 					label.Text = ""
