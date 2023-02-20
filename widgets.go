@@ -1,13 +1,22 @@
 package main
 
 import (
+	"errors"
+	"image/color"
 	"log"
+	"os"
+	"strconv"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"github.com/deroproject/derohe/rpc"
+	"github.com/SixofClubsss/dReams/rpc"
+	"github.com/SixofClubsss/dReams/table"
+	dero "github.com/deroproject/derohe/rpc"
 )
 
 // / declare some widgets
@@ -15,7 +24,7 @@ var (
 	primes   = []string{"MAINNET", "TESTNET", "SIMULATOR", "CUSTOM"} /// set select menu
 	dropDown = widget.NewSelect(primes, func(s string) {             /// do when select changes
 		whichDaemon(s)
-		log.Println("Daemon Set To:", s)
+		log.Println("[dSlate] Daemon Set To:", s)
 	})
 
 	rpcLoginInput  = widget.NewPasswordEntry()
@@ -54,7 +63,6 @@ func rpcWalletEdit() fyne.Widget { /// wallet rpc address entry
 
 func rpcConnectButton() fyne.Widget { /// wallet connect button
 	button := widget.NewButton("Connect", func() { /// do on pressed
-		log.Println("Connect Pressed")
 		walletAddress = rpcWalletInput.Text
 		GetAddress()
 	})
@@ -119,7 +127,7 @@ func contractEdit() fyne.Widget { /// contract entry
 func searchButton() fyne.Widget { /// SC search button
 	button := widget.NewButton("Search", func() {
 		log.Println("Searching for: " + contractInput.Text)
-		p := &rpc.GetSC_Params{
+		p := &dero.GetSC_Params{
 			SCID:      contractInput.Text,
 			Code:      true,
 			Variables: true,
@@ -197,30 +205,30 @@ func gnomonOpts() fyne.CanvasObject {
 			case "Key":
 				switch soru.Selected {
 				case "String":
-					log.Println("Search results for string key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, true))
+					log.Println("[dSlate] Search results for string key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, true))
 					label.SetText(searchByKey(contractInput.Text, kv_entry.Text, true))
 				case "Uint64":
-					log.Println("Search results for uint64 key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, false))
+					log.Println("[dSlate] Search results for uint64 key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, false))
 					label.SetText(searchByKey(contractInput.Text, kv_entry.Text, false))
 				default:
-					log.Println("Select string or uint64")
+					log.Println("[dSlate] Select string or uint64")
 				}
 			case "Value":
 				switch soru.Selected {
 				case "String":
-					log.Println("Search results for string value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, true))
+					log.Println("[dSlate] Search results for string value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, true))
 					label.SetText(searchByValue(contractInput.Text, kv_entry.Text, true))
 				case "Uint64":
-					log.Println("Search results for uint64 value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, false))
+					log.Println("[dSlate] Search results for uint64 value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, false))
 					label.SetText(searchByValue(contractInput.Text, kv_entry.Text, false))
 				default:
-					log.Println("Select string or uint64")
+					log.Println("[dSlate] Select string or uint64")
 				}
 			default:
-				log.Println("Select key or value")
+				log.Println("[dSlate] Select key or value")
 			}
 		} else {
-			log.Println("Gnomon not initialized")
+			log.Println("[dSlate] Gnomon not initialized")
 		}
 
 	})
@@ -232,5 +240,135 @@ func gnomonOpts() fyne.CanvasObject {
 		container.NewAdaptiveGrid(2, kv_entry, search))
 
 	return cont
+
+}
+
+type nfaAmt struct {
+	table.NumericalEntry
+}
+
+func nfaOpts() fyne.CanvasObject {
+	label := canvas.NewText("", color.White)
+	label.TextSize = 18
+
+	asset := widget.NewEntry()
+	asset.SetPlaceHolder("File Name:")
+
+	start := &nfaAmt{}
+	start.ExtendBaseWidget(start)
+	start.SetPlaceHolder("Starting at #:")
+	start.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
+
+	limit := &nfaAmt{}
+	limit.ExtendBaseWidget(limit)
+	limit.SetPlaceHolder("Ending at #:")
+	limit.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
+
+	fee := &nfaAmt{}
+	fee.ExtendBaseWidget(fee)
+	fee.SetPlaceHolder("Fee:")
+	fee.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
+
+	var run, kill bool
+
+	stop := widget.NewButton("Stop Install", func() {
+		log.Println("[dSlate] Stopping install loop")
+		label.Text = "Stopping install loop..."
+		label.Refresh()
+		kill = true
+	})
+
+	var install fyne.Widget
+	install = widget.NewButton("Install Nfas", func() {
+		go func() {
+			if fee.Validate() == nil && limit.Validate() == nil && start.Validate() == nil {
+				if !run {
+					run = true
+					install.Hide()
+					stop.Show()
+					asset.Disable()
+					start.Disable()
+					limit.Disable()
+					fee.Disable()
+
+					name := asset.Text
+					lim := rpc.StringToInt(limit.Text)
+					fe := rpc.StringToInt(fee.Text)
+					inc := rpc.StringToInt(start.Text)
+
+					log.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
+
+					for i := 10; i > 0; i-- {
+						if kill {
+							break
+						}
+
+						label.Text = "Starting install loop in " + strconv.Itoa(i)
+						label.Refresh()
+						time.Sleep(1 * time.Second)
+					}
+
+					label.Text = ""
+					label.Refresh()
+
+					for {
+						if kill {
+							break
+						}
+
+						path := name + strconv.Itoa(inc) + ".bas"
+						if _, err := os.Stat(path); err == nil {
+							log.Println("[dSlate] Installing", path)
+							label.Text = "Installing " + path
+							label.Refresh()
+						} else if errors.Is(err, os.ErrNotExist) {
+							log.Println("[dSlate]", path, "Not Found")
+							break
+
+						}
+
+						file, err := os.ReadFile(path)
+
+						if err != nil {
+							log.Println("[dSlate]", err)
+							break
+						}
+
+						uploadContract(string(file), uint64(fe))
+						inc++
+
+						if inc > lim {
+							break
+						}
+
+						log.Println("[dSlate] Waiting for block")
+						time.Sleep(10 * time.Second)
+					}
+
+					label.Text = ""
+					label.Refresh()
+					install.Show()
+					stop.Hide()
+					asset.Enable()
+					start.Enable()
+					limit.Enable()
+					fee.Enable()
+					run = false
+					kill = false
+					log.Println("[dSlate] Install loop complete")
+
+				} else {
+					log.Println("[dSlate] Install already running")
+				}
+			} else {
+				stop.Hide()
+				log.Println("[dSlate] Install entries not valid")
+			}
+		}()
+	})
+
+	stop.Hide()
+
+	return container.NewVBox(layout.NewSpacer(), container.NewCenter(label), asset, fee, start, limit, install, stop)
 
 }

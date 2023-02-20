@@ -52,7 +52,6 @@ func GetHeight() error { /// get current height and displays
 		return nil
 	}
 	h := result.Height
-	log.Printf("Daemon Height: %d \n", h)
 	str := strconv.FormatUint(h, 10)
 	currentHeight.SetText("Height: " + str)
 
@@ -67,7 +66,7 @@ func getSC(p *dero.GetSC_Params) error { /// search sc using getsc method
 	err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", p)
 
 	if err != nil {
-		log.Println(err)
+		log.Println("[getSC]", err)
 		return nil
 	}
 

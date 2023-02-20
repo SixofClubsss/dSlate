@@ -21,11 +21,11 @@ func whichDaemon(s string) { /// select menu changes dameon address
 func isDaemonConnected() { /// check if daemon is connected
 	if daemonConnect {
 		if !daemonCheckBox.Checked {
-			log.Println("Daemon Connected")
+			log.Println("[dSlate] Daemon Connected")
 		}
 		daemonCheckBox.SetChecked(true)
 	} else {
-		log.Println("Daemon Not Connected")
+		log.Println("[dSlate] Daemon Not Connected")
 		currentHeight.SetText("Height:")
 		if daemonCheckBox.Checked {
 			daemonCheckBox.SetChecked(false)
@@ -37,13 +37,13 @@ func isDaemonConnected() { /// check if daemon is connected
 func isWalletConnected() { /// check if wallet is connected
 	if walletConnect {
 		if !walletCheckBox.Checked {
-			log.Println("Wallet Connected")
+			log.Println("[dSlate] Wallet Connected")
 			walletCheckBox.SetChecked(true)
 		}
 		GetBalance()
 
 	} else {
-		log.Println("Wallet Not Connected")
+		log.Println("[dSlate] Wallet Not Connected")
 		if walletCheckBox.Checked {
 			walletCheckBox.SetChecked(false)
 			walletConnect = false

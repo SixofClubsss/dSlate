@@ -21,7 +21,7 @@ var Gnomes gnomon
 
 func startGnomon(ep string) {
 	Gnomes.Start = true
-	log.Println("Starting Gnomon.")
+	log.Println("[dSlate] Starting Gnomon.")
 	backend := menu.GnomonDB()
 
 	last_height := backend.GetLastIndexHeight()
@@ -41,12 +41,12 @@ func startGnomon(ep string) {
 
 func StopGnomon(gi bool) {
 	if gi && !menu.GnomonClosing() {
-		log.Println("Putting Gnomon to Sleep.")
+		log.Println("[dSlate] Putting Gnomon to Sleep.")
 		Gnomes.Indexer.Close()
 		Gnomes.Init = false
 		gnomonEnabled.SetSelected("Off")
 		time.Sleep(1 * time.Second)
-		log.Println("Gnomon is Sleeping.")
+		log.Println("[dSlate] Gnomon is Sleeping.")
 	}
 }
 
@@ -59,7 +59,7 @@ func searchByKey(scid string, key string, s bool) string {
 			sValue, uValue = Gnomes.Indexer.Backend.GetSCIDValuesByKey(scid, key, Gnomes.Indexer.ChainHeight, true)
 		} else {
 			if i, err := strconv.Atoi(key); err != nil {
-				log.Println(err)
+				log.Println("[dSlate]", err)
 			} else {
 				sValue, uValue = Gnomes.Indexer.Backend.GetSCIDValuesByKey(scid, uint64(i), Gnomes.Indexer.ChainHeight, true)
 			}
@@ -85,7 +85,7 @@ func searchByValue(scid string, value string, s bool) string {
 			sValue, uValue = Gnomes.Indexer.Backend.GetSCIDKeysByValue(scid, value, Gnomes.Indexer.ChainHeight, true)
 		} else {
 			if i, err := strconv.Atoi(value); err != nil {
-				log.Println(err)
+				log.Println("[dSlate]", err)
 			} else {
 				sValue, uValue = Gnomes.Indexer.Backend.GetSCIDKeysByValue(scid, uint64(i), Gnomes.Indexer.ChainHeight, true)
 			}

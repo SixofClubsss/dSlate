@@ -31,7 +31,7 @@ func GetAddress() error { /// get address with user:pass
 	if err != nil {
 		walletConnect = false
 		walletCheckBox.SetChecked(false)
-		log.Println(err)
+		log.Println("[GetAddress]", err)
 		return nil
 	}
 
@@ -39,8 +39,8 @@ func GetAddress() error { /// get address with user:pass
 	if address == 66 {
 		walletConnect = true
 		walletCheckBox.SetChecked(true)
-		log.Println("Wallet Connected")
-		log.Println("Dero Address:" + result.Address)
+		log.Println("[dSlate] Wallet Connected")
+		log.Println("[dSlate] Dero Address: " + result.Address)
 		data := []byte(rpcLoginInput.Text)
 		passHash = sha256.Sum256(data)
 	}
@@ -56,7 +56,7 @@ func GetBalance() error { /// get wallet balance
 	err := rpcClientW.CallFor(ctx, &result, "GetBalance")
 
 	if err != nil {
-		log.Println(err)
+		log.Println("[GetBalance]", err)
 		return nil
 	}
 
@@ -64,6 +64,32 @@ func GetBalance() error { /// get wallet balance
 	div := atomic / 100000
 	str := strconv.FormatFloat(div, 'f', 5, 64)
 	walletBalance.SetText("Balance: " + str)
+
+	return err
+}
+
+func uploadContract(code string, fee uint64) error {
+	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
+	defer cancel()
+
+	txid := dero.Transfer_Result{}
+
+	params := &dero.Transfer_Params{
+		Transfers: []dero.Transfer{},
+		SC_Code:   code,
+		SC_Value:  0,
+		SC_RPC:    dero.Arguments{},
+		Ringsize:  2,
+		Fees:      fee,
+	}
+
+	err := rpcClientW.CallFor(ctx, &txid, "transfer", params)
+	if err != nil {
+		log.Println("[uploadContract]", err)
+		return nil
+	}
+
+	log.Println("[uploadContract] TXID:", txid)
 
 	return err
 }

@@ -17,9 +17,8 @@ func confirmPopUp() { /// pop up for entering custom daemon address
 	custom_input.SetPlaceHolder("Custom Daemon Address:")
 
 	confirm := widget.NewButton("Enter", func() {
-		log.Println("Confirm tapped")
 		daemonAddress = custom_input.Text
-		log.Println("Daemon Set To: CUSTOM")
+		log.Println("[dSlate] Daemon Set To: CUSTOM")
 	})
 
 	content := container.NewBorder(

@@ -84,6 +84,7 @@ func placeWith() *container.AppTabs {
 		container.NewTabItem("Search", scroll),
 		container.NewTabItem("Blank Slate", blankWidget()),
 		container.NewTabItem("?", imageContent),
+		container.NewTabItem("NFA", nfaOpts()),
 	)
 
 	tabs.SetTabLocation(container.TabLocationTop)

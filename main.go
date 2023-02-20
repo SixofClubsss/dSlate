@@ -67,7 +67,7 @@ func fetchLoop() { /// ping daemon and get height loop
 					Gnomes.Indexer.Endpoint = daemonAddress
 				}
 			case <-quit: /// exit loop
-				log.Println("Exiting...")
+				log.Println("[dSlate] Exiting...")
 				ticker.Stop()
 				return
 			}
