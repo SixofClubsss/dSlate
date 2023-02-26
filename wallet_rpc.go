@@ -68,7 +68,7 @@ func GetBalance() error { /// get wallet balance
 	return err
 }
 
-func uploadContract(code string, fee uint64) error {
+func uploadContract(code string, fee uint64) error { /// install new contract
 	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
 	defer cancel()
 
@@ -90,6 +90,53 @@ func uploadContract(code string, fee uint64) error {
 	}
 
 	log.Println("[uploadContract] TXID:", txid)
+
+	return err
+}
+
+func updateContract(scid, code string, fee uint64) error { /// update existing contracts with 'UpdateCode' entrypoint
+	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
+	defer cancel()
+
+	arg1 := dero.Argument{Name: "entrypoint", DataType: "S", Value: "UpdateCode"}
+	arg2 := dero.Argument{Name: "code", DataType: "S", Value: code}
+	args := dero.Arguments{arg1, arg2}
+	txid := dero.Transfer_Result{}
+
+	var addr string
+	switch daemonAddress {
+	case "127.0.0.1:10102":
+		addr = "dero1qyr8yjnu6cl2c5yqkls0hmxe6rry77kn24nmc5fje6hm9jltyvdd5qq4hn5pn"
+	case "127.0.0.1:40102":
+		addr = "deto1qyre7td6x9r88y4cavdgpv6k7lvx6j39lfsx420hpvh3ydpcrtxrxqg8v8e3z"
+	case "127.0.0.1:20000":
+		addr = "deto1qyre7td6x9r88y4cavdgpv6k7lvx6j39lfsx420hpvh3ydpcrtxrxqg8v8e3z"
+	default:
+		addr = "dero1qyr8yjnu6cl2c5yqkls0hmxe6rry77kn24nmc5fje6hm9jltyvdd5qq4hn5pn"
+	}
+
+	t1 := dero.Transfer{
+		Destination: addr,
+		Amount:      0,
+		Burn:        0,
+	}
+
+	t := []dero.Transfer{t1}
+	params := &dero.Transfer_Params{
+		Transfers: t,
+		SC_ID:     scid,
+		SC_RPC:    args,
+		Ringsize:  2,
+		Fees:      fee,
+	}
+
+	err := rpcClientW.CallFor(ctx, &txid, "transfer", params)
+	if err != nil {
+		log.Println("[updateContract]", err)
+		return nil
+	}
+
+	log.Println("[updateContract] Update TX:", txid)
 
 	return err
 }

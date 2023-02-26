@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 	"strconv"
@@ -79,6 +80,28 @@ func getSC(p *dero.GetSC_Params) error { /// search sc using getsc method
 	uint_keys := SortUintMap(result.VariableUint64Keys) /// retrieve all sc uint keys use result.VariableUint64Keys[0] for single value
 
 	go searchPopUp(balances, string_keys, uint_keys, result.Code) /// displays results
+
+	return err
+}
+
+func getSCcode(scid string) error { /// get sc code and print in terminal
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
+	defer cancel()
+
+	var result *dero.GetSC_Result
+	params := dero.GetSC_Params{
+		SCID:      scid,
+		Code:      true,
+		Variables: false,
+	}
+	err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", params)
+
+	if err != nil {
+		log.Println("[getSCcode]", err)
+		return nil
+	}
+
+	fmt.Println(result.Code)
 
 	return err
 }

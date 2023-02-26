@@ -73,6 +73,8 @@ func placeWith() *container.AppTabs {
 		contractEdit(),
 		searchButton(),
 		layout.NewSpacer(),
+		contractCode(),
+		layout.NewSpacer(),
 		enableGnomon(),
 		gnomonOpts())
 

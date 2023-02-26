@@ -29,7 +29,7 @@ var (
 
 	rpcLoginInput  = widget.NewPasswordEntry()
 	rpcWalletInput = widget.NewEntry()
-	contractInput  = widget.NewEntry()
+	contractInput  = widget.NewMultiLineEntry()
 
 	daemonCheckBox = widget.NewCheck("Daemon Connected", func(value bool) {
 		StopGnomon(Gnomes.Init)
@@ -120,8 +120,19 @@ func contractEdit() fyne.Widget { /// contract entry
 	contractInput.SetPlaceHolder("Enter Contract Id:")
 	contractInput.Resize(fyne.NewSize(360, 45))
 	contractInput.Move(fyne.NewPos(10, 15))
+	contractInput.Wrapping = fyne.TextWrapWord
 
 	return contractInput
+}
+
+func contractCode() fyne.Widget {
+	button := widget.NewButton("SC Code", func() {
+		if len(contractInput.Text) == 64 {
+			getSCcode(contractInput.Text)
+		}
+	})
+
+	return button
 }
 
 func searchButton() fyne.Widget { /// SC search button
@@ -324,7 +335,6 @@ func nfaOpts() fyne.CanvasObject {
 						} else if errors.Is(err, os.ErrNotExist) {
 							log.Println("[dSlate]", path, "Not Found")
 							break
-
 						}
 
 						file, err := os.ReadFile(path)
@@ -367,8 +377,32 @@ func nfaOpts() fyne.CanvasObject {
 		}()
 	})
 
+	update := widget.NewButton("Update Contract", func() {
+		path := asset.Text
+		if _, err := os.Stat(path); err == nil {
+			log.Println("[dSlate] Update Path", path)
+			file, err := os.ReadFile(path)
+
+			if err != nil {
+				log.Println("[dSlate]", err)
+				return
+			}
+			code := string(file)
+			if code != "" {
+				fe := rpc.StringToInt(fee.Text)
+				updateContract(contractInput.Text, string(file), uint64(fe))
+			} else {
+				log.Println("[dSlate] Failed to update, code is empty string")
+			}
+
+		} else if errors.Is(err, os.ErrNotExist) {
+			log.Println("[dSlate]", path, "Not Found")
+		}
+
+	})
+
 	stop.Hide()
 
-	return container.NewVBox(layout.NewSpacer(), container.NewCenter(label), asset, fee, start, limit, install, stop)
+	return container.NewVBox(layout.NewSpacer(), container.NewCenter(label), asset, fee, start, limit, install, stop, layout.NewSpacer(), update)
 
 }
