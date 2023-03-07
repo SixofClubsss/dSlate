@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -17,6 +18,7 @@ import (
 	"github.com/SixofClubsss/dReams/rpc"
 	"github.com/SixofClubsss/dReams/table"
 	dero "github.com/deroproject/derohe/rpc"
+	"github.com/deroproject/derohe/walletapi"
 )
 
 // / declare some widgets
@@ -46,7 +48,7 @@ var (
 )
 
 func rpcLoginEdit() fyne.Widget { /// user:pass password entry
-	rpcLoginInput.SetPlaceHolder("Enter user:pass")
+	rpcLoginInput.SetPlaceHolder("RPC user:pass")
 	rpcLoginInput.Resize(fyne.NewSize(360, 45))
 	rpcLoginInput.Move(fyne.NewPos(10, 650))
 
@@ -137,7 +139,7 @@ func contractCode() fyne.Widget {
 
 func searchButton() fyne.Widget { /// SC search button
 	button := widget.NewButton("Search", func() {
-		log.Println("Searching for: " + contractInput.Text)
+		log.Println("[dSlate] Searching for: " + contractInput.Text)
 		p := &dero.GetSC_Params{
 			SCID:      contractInput.Text,
 			Code:      true,
@@ -262,8 +264,8 @@ func nfaOpts() fyne.CanvasObject {
 	label := canvas.NewText("", color.White)
 	label.TextSize = 18
 
-	asset := widget.NewEntry()
-	asset.SetPlaceHolder("File Name:")
+	file_name := widget.NewEntry()
+	file_name.SetPlaceHolder("File Name:")
 
 	start := &nfaAmt{}
 	start.ExtendBaseWidget(start)
@@ -297,12 +299,12 @@ func nfaOpts() fyne.CanvasObject {
 					run = true
 					install.Hide()
 					stop.Show()
-					asset.Disable()
+					file_name.Disable()
 					start.Disable()
 					limit.Disable()
 					fee.Disable()
 
-					name := asset.Text
+					name := file_name.Text
 					lim := rpc.StringToInt(limit.Text)
 					fe := rpc.StringToInt(fee.Text)
 					inc := rpc.StringToInt(start.Text)
@@ -359,7 +361,7 @@ func nfaOpts() fyne.CanvasObject {
 					label.Refresh()
 					install.Show()
 					stop.Hide()
-					asset.Enable()
+					file_name.Enable()
 					start.Enable()
 					limit.Enable()
 					fee.Enable()
@@ -378,7 +380,7 @@ func nfaOpts() fyne.CanvasObject {
 	})
 
 	update := widget.NewButton("Update Contract", func() {
-		path := asset.Text
+		path := file_name.Text
 		if _, err := os.Stat(path); err == nil {
 			log.Println("[dSlate] Update Path", path)
 			file, err := os.ReadFile(path)
@@ -403,6 +405,69 @@ func nfaOpts() fyne.CanvasObject {
 
 	stop.Hide()
 
-	return container.NewVBox(layout.NewSpacer(), container.NewCenter(label), asset, fee, start, limit, install, stop, layout.NewSpacer(), update)
+	wf_entry := widget.NewEntry()
+	wf_entry.SetPlaceHolder("Wallet file name:")
+	wf_pass := widget.NewPasswordEntry()
+	wf_pass.SetPlaceHolder("Wallet file password:")
 
+	verify_button := widget.NewButton("Verify Sign File", func() {
+		if wf, err := walletapi.Open_Encrypted_Wallet(wf_entry.Text, wf_pass.Text); err == nil {
+			input_file := file_name.Text
+			output_file := strings.TrimSuffix(input_file, ".sign")
+
+			if data, err := os.ReadFile(input_file); err != nil {
+				log.Println("[dSlate] Cannot read input file", err)
+			} else if signer, message, err := wf.CheckSignature(data); err != nil {
+				log.Println("[dSlate] Signature verify failed", input_file, err)
+			} else {
+				log.Println("[dSlate] Signed by", "address", signer.String())
+
+				if os.WriteFile(output_file, message, 0600); err != nil {
+					log.Println("[dSlate] Cannot write output file", output_file, err)
+				}
+				log.Println("[dSlate] Successfully wrote message to file. please check", "file", output_file)
+
+				wf.Close_Encrypted_Wallet()
+			}
+		} else {
+			log.Println("[dSlate] Wallet", err)
+		}
+	})
+
+	sign_button := widget.NewButton("Sign File", func() {
+		if wf, err := walletapi.Open_Encrypted_Wallet(wf_entry.Text, wf_pass.Text); err == nil {
+			input_file := file_name.Text
+			output_file := input_file + ".sign"
+
+			if data, err := os.ReadFile(input_file); err != nil {
+				log.Println("[dSlate] Cannot read input file", err)
+			} else if err := os.WriteFile(output_file, wf.SignData(data), 0600); err != nil {
+				log.Println("[dSlate] Cannot write output file", output_file)
+			} else {
+				log.Println("[dSlate] Successfully signed file. please check", output_file)
+			}
+
+			wf.Close_Encrypted_Wallet()
+		} else {
+			log.Println("[dSlate] Wallet", err)
+		}
+	})
+
+	return container.NewVBox(
+		file_name,
+		layout.NewSpacer(),
+		verify_button,
+		layout.NewSpacer(),
+		wf_entry,
+		wf_pass,
+		sign_button,
+		layout.NewSpacer(),
+		container.NewCenter(label),
+		fee,
+		start,
+		limit,
+		install,
+		stop,
+		layout.NewSpacer(),
+		update)
 }
