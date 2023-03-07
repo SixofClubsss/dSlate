@@ -426,9 +426,9 @@ func nfaOpts() fyne.CanvasObject {
 					log.Println("[dSlate] Cannot write output file", output_file, err)
 				}
 				log.Println("[dSlate] Successfully wrote message to file. please check", "file", output_file)
-
-				wf.Close_Encrypted_Wallet()
 			}
+
+			wf.Close_Encrypted_Wallet()
 		} else {
 			log.Println("[dSlate] Wallet", err)
 		}
