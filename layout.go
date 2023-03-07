@@ -57,7 +57,7 @@ func placeWith() *container.AppTabs {
 
 	hbox := container.NewAdaptiveGrid(2,
 		daemonSelectOption(),
-		layout.NewSpacer())
+		debugEnabled)
 
 	vbox := container.NewVBox(hbox, grid, checks, rpcLoginEdit(), wallet)
 

@@ -25,7 +25,9 @@ func isDaemonConnected() { /// check if daemon is connected
 		}
 		daemonCheckBox.SetChecked(true)
 	} else {
-		log.Println("[dSlate] Daemon RPC Not Connected")
+		if debug {
+			log.Println("[dSlate] Daemon RPC Not Connected")
+		}
 		currentHeight.SetText("Height:")
 		if daemonCheckBox.Checked {
 			daemonCheckBox.SetChecked(false)
@@ -43,7 +45,9 @@ func isWalletConnected() { /// check if wallet is connected
 		GetBalance()
 
 	} else {
-		log.Println("[dSlate] Wallet RPC Not Connected")
+		if debug {
+			log.Println("[dSlate] Wallet RPC Not Connected")
+		}
 		if walletCheckBox.Checked {
 			walletCheckBox.SetChecked(false)
 			walletConnect = false

@@ -45,6 +45,14 @@ var (
 	walletBalance = widget.NewEntry()
 
 	gnomonEnabled = widget.NewRadioGroup([]string{}, func(s string) {})
+
+	debugEnabled = widget.NewCheck("Debug", func(b bool) {
+		if b {
+			debug = true
+		} else {
+			debug = false
+		}
+	})
 )
 
 func rpcLoginEdit() fyne.Widget { /// user:pass password entry
@@ -282,27 +290,29 @@ func nfaOpts() fyne.CanvasObject {
 	fee.SetPlaceHolder("Fee:")
 	fee.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
-	var run, kill bool
-
-	stop := widget.NewButton("Stop Install", func() {
+	stop := widget.NewButton("Stop Loop", func() {
 		log.Println("[dSlate] Stopping install loop")
 		label.Text = "Stopping install loop..."
 		label.Refresh()
-		kill = true
+		kill_process = true
 	})
+
+	extension := widget.NewSelect([]string{".jpg", ".png", ".gif", ".mp3", ".mp4", ".pdf", ".zip", ".7z", ".avi", ".mov", ".ogg"}, func(s string) {})
+	extension.PlaceHolder = "ext"
 
 	var install fyne.Widget
 	install = widget.NewButton("Install Nfas", func() {
 		go func() {
 			if fee.Validate() == nil && limit.Validate() == nil && start.Validate() == nil {
-				if !run {
-					run = true
+				if !process_on {
+					process_on = true
 					install.Hide()
 					stop.Show()
 					file_name.Disable()
 					start.Disable()
 					limit.Disable()
 					fee.Disable()
+					extension.Disable()
 
 					name := file_name.Text
 					lim := rpc.StringToInt(limit.Text)
@@ -312,7 +322,7 @@ func nfaOpts() fyne.CanvasObject {
 					log.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
 
 					for i := 10; i > 0; i-- {
-						if kill {
+						if kill_process {
 							break
 						}
 
@@ -325,7 +335,7 @@ func nfaOpts() fyne.CanvasObject {
 					label.Refresh()
 
 					for {
-						if kill {
+						if kill_process {
 							break
 						}
 
@@ -365,8 +375,9 @@ func nfaOpts() fyne.CanvasObject {
 					start.Enable()
 					limit.Enable()
 					fee.Enable()
-					run = false
-					kill = false
+					extension.Enable()
+					process_on = false
+					kill_process = false
 					log.Println("[dSlate] Install loop complete")
 
 				} else {
@@ -435,26 +446,95 @@ func nfaOpts() fyne.CanvasObject {
 	})
 
 	sign_button := widget.NewButton("Sign File", func() {
-		if wf, err := walletapi.Open_Encrypted_Wallet(wf_entry.Text, wf_pass.Text); err == nil {
-			input_file := file_name.Text
-			output_file := input_file + ".sign"
+		if limit.Validate() == nil && start.Validate() == nil {
+			if wf, err := walletapi.Open_Encrypted_Wallet(wf_entry.Text, wf_pass.Text); err == nil {
+				go func() {
+					if !process_on {
+						process_on = true
+						install.Hide()
+						stop.Show()
+						file_name.Disable()
+						start.Disable()
+						limit.Disable()
+						fee.Disable()
+						extension.Disable()
 
-			if data, err := os.ReadFile(input_file); err != nil {
-				log.Println("[dSlate] Cannot read input file", err)
-			} else if err := os.WriteFile(output_file, wf.SignData(data), 0600); err != nil {
-				log.Println("[dSlate] Cannot write output file", output_file)
+						ext := extension.Selected
+						input := file_name.Text
+						lim := rpc.StringToInt(limit.Text)
+						inc := rpc.StringToInt(start.Text)
+
+						log.Println("[dSlate] Starting sign loop for", input+strconv.Itoa(inc)+ext, "to", input+strconv.Itoa(lim)+ext)
+
+						for i := 10; i > 0; i-- {
+							if kill_process {
+								break
+							}
+
+							label.Text = "Starting sign loop in " + strconv.Itoa(i)
+							label.Refresh()
+							time.Sleep(1 * time.Second)
+						}
+
+						label.Text = ""
+						label.Refresh()
+
+						for {
+							if kill_process {
+								break
+							}
+
+							input_file := input + strconv.Itoa(inc) + ext
+							output_file := input_file + ".sign"
+
+							if data, err := os.ReadFile(input_file); err != nil {
+								log.Println("[dSlate] Cannot read input file", err)
+								break
+							} else if err := os.WriteFile(output_file, wf.SignData(data), 0600); err != nil {
+								log.Println("[dSlate] Cannot write output file", output_file)
+								break
+							} else {
+								log.Println("[dSlate] Successfully signed file. please check", output_file)
+							}
+
+							inc++
+
+							if inc > lim {
+								break
+							}
+
+							time.Sleep(6 * time.Second)
+						}
+
+						label.Text = ""
+						label.Refresh()
+						install.Show()
+						stop.Hide()
+						file_name.Enable()
+						start.Enable()
+						limit.Enable()
+						fee.Enable()
+						extension.Enable()
+						process_on = false
+						kill_process = false
+						log.Println("[dSlate] Sign loop complete")
+
+					} else {
+						log.Println("[dSlate] Loop already running")
+					}
+
+					wf.Close_Encrypted_Wallet()
+				}()
 			} else {
-				log.Println("[dSlate] Successfully signed file. please check", output_file)
+				log.Println("[dSlate] Wallet", err)
 			}
-
-			wf.Close_Encrypted_Wallet()
 		} else {
-			log.Println("[dSlate] Wallet", err)
+			log.Println("[dSlate] Sign entries not valid")
 		}
 	})
 
 	return container.NewVBox(
-		file_name,
+		container.NewBorder(nil, nil, nil, extension, file_name),
 		layout.NewSpacer(),
 		verify_button,
 		layout.NewSpacer(),
@@ -463,9 +543,10 @@ func nfaOpts() fyne.CanvasObject {
 		sign_button,
 		layout.NewSpacer(),
 		container.NewCenter(label),
-		fee,
 		start,
 		limit,
+		layout.NewSpacer(),
+		fee,
 		install,
 		stop,
 		layout.NewSpacer(),

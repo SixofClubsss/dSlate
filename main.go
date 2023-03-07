@@ -21,6 +21,10 @@ var (
 	myApp    = app.New()
 	myWindow fyne.Window
 	quit     chan struct{}
+
+	debug        bool
+	process_on   bool
+	kill_process bool
 )
 
 func main() {
@@ -30,6 +34,7 @@ func main() {
 	myWindow.SetFixedSize(true)
 	myWindow.SetIcon(resourceDReamTablesIconPng)
 	myWindow.SetCloseIntercept(func() { /// do when close
+		kill_process = true
 		stopLoop()
 		myWindow.Close()
 	})
@@ -46,6 +51,7 @@ func init() { /// Handle ctrl-c close
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
+		kill_process = true
 		stopLoop()
 		fmt.Println()
 		os.Exit(1)
