@@ -4,20 +4,17 @@ go 1.19
 
 require (
 	fyne.io/fyne/v2 v2.3.1
-	github.com/SixofClubsss/dReams v0.9.2
-	github.com/civilware/Gnomon v0.0.0-20221208192504-80c0dc69fea7
+	github.com/SixofClubsss/dReams v0.9.3
+	github.com/civilware/Gnomon v0.0.0-20230130224610-7e5b7651ce52
 	github.com/deroproject/derohe v0.0.0-20230219151438-e855701f67c9
 )
 
 require (
 	fyne.io/fyne v1.4.3 // indirect
 	fyne.io/systray v1.10.1-0.20230207085535-4a244dbb9d03 // indirect
-	github.com/beevik/ntp v0.3.0 // indirect
 	github.com/benoitkugler/textlayout v0.3.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
-	github.com/cenkalti/hub v1.0.1 // indirect
-	github.com/cenkalti/rpc2 v0.0.0-20210604223624-c1acbc6ec984 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/creachadair/jrpc2 v0.43.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -42,7 +39,6 @@ require (
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
 	github.com/klauspost/compress v1.15.13 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.2 // indirect
-	github.com/lesismal/llib v1.1.10 // indirect
 	github.com/lesismal/nbio v1.3.10 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
