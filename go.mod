@@ -1,4 +1,4 @@
-module SixofClubsss/dSlate
+module github.com/SixofClubsss/dSlate
 
 go 1.19
 
