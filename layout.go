@@ -5,7 +5,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 )
 
-// / organize content without layout
+// Organize content without layout
 func placeWithout() *container.AppTabs {
 	settings_content := container.NewWithoutLayout(
 		rpcWalletEdit(),
@@ -37,7 +37,7 @@ func placeWithout() *container.AppTabs {
 	return tabs
 }
 
-// / organize content with layout
+// Organize content with layout
 func placeWith() *container.AppTabs {
 
 	wallet := container.NewBorder(

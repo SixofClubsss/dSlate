@@ -17,33 +17,9 @@ const (
 	DAEMON_SIMULATOR_DEFAULT = "127.0.0.1:20000"
 )
 
-var (
-	daemonAddress string
-	daemonConnect bool
-)
-
-func Ping() error { /// ping blockchain for connection
-	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
-	defer cancel()
-
-	var result string
-	err := rpcClientD.CallFor(ctx, &result, "DERO.Ping")
-	if err != nil {
-		daemonConnect = false
-		return nil
-	}
-
-	if result == "Pong " {
-		daemonConnect = true
-	} else {
-		daemonConnect = false
-	}
-
-	return err
-}
-
-func GetHeight() error { /// get current height and displays
-	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
+// Gets current height and displays
+func GetHeight() error {
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(rpc.Daemon.Rpc)
 	defer cancel()
 
 	var result *dero.Daemon_GetHeight_Result
@@ -59,8 +35,9 @@ func GetHeight() error { /// get current height and displays
 	return err
 }
 
-func getSC(p *dero.GetSC_Params) error { /// search sc using getsc method
-	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
+// Search SC using getsc method
+func getSC(p *dero.GetSC_Params) error {
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(rpc.Daemon.Rpc)
 	defer cancel()
 
 	var result *dero.GetSC_Result
@@ -84,8 +61,9 @@ func getSC(p *dero.GetSC_Params) error { /// search sc using getsc method
 	return err
 }
 
-func getSCcode(scid string) error { /// get sc code and print in terminal
-	rpcClientD, ctx, cancel := rpc.SetDaemonClient(daemonAddress)
+// Get sSC code and print in terminal
+func getSCcode(scid string) error {
+	rpcClientD, ctx, cancel := rpc.SetDaemonClient(rpc.Daemon.Rpc)
 	defer cancel()
 
 	var result *dero.GetSC_Result
@@ -106,6 +84,7 @@ func getSCcode(scid string) error { /// get sc code and print in terminal
 	return err
 }
 
+// Switch for interface type to string
 func findKey(i interface{}) (text string) {
 	switch v := i.(type) {
 	case uint64:

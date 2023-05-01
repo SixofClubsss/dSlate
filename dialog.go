@@ -6,10 +6,13 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/SixofClubsss/dReams/rpc"
 )
 
-func confirmPopUp() { /// pop up for entering custom daemon address
+// Pop up for entering custom daemon address
+func confirmPopUp() {
 	cw := fyne.CurrentApp().NewWindow("Enter Custom Address")
+	cw.SetIcon(resourceDReamTablesIconPng)
 	cw.Resize(fyne.NewSize(380, 50))
 	cw.SetFixedSize(true)
 
@@ -17,7 +20,7 @@ func confirmPopUp() { /// pop up for entering custom daemon address
 	custom_input.SetPlaceHolder("Custom Daemon Address:")
 
 	confirm := widget.NewButton("Enter", func() {
-		daemonAddress = custom_input.Text
+		rpc.Daemon.Rpc = custom_input.Text
 		log.Println("[dSlate] Daemon Set To: CUSTOM")
 	})
 
@@ -32,8 +35,10 @@ func confirmPopUp() { /// pop up for entering custom daemon address
 	cw.Show()
 }
 
-func searchPopUp(b, s, u, c string) { /// pop up display for sc search results
+// Pop up display for sc search results
+func searchPopUp(b, s, u, c string) {
 	sw := fyne.CurrentApp().NewWindow("Search Results")
+	sw.SetIcon(resourceDReamTablesIconPng)
 	sw.Resize(fyne.NewSize(680, 800))
 	sw.SetFixedSize(true)
 

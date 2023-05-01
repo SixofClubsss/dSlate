@@ -12,11 +12,13 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/SixofClubsss/dReams/dwidget"
+	"github.com/SixofClubsss/dReams/menu"
 	"github.com/SixofClubsss/dReams/rpc"
-	"github.com/SixofClubsss/dReams/table"
 	dero "github.com/deroproject/derohe/rpc"
 	"github.com/deroproject/derohe/walletapi"
 )
@@ -30,11 +32,11 @@ var (
 	})
 
 	rpcLoginInput  = widget.NewPasswordEntry()
-	rpcWalletInput = widget.NewEntry()
+	rpcWalletInput = widget.NewSelectEntry([]string{WALLET_SIMULATOR_DEFAULT, WALLET_TESTNET_DEFAULT, WALLET_MAINNET_DEFAULT})
 	contractInput  = widget.NewMultiLineEntry()
 
 	daemonCheckBox = widget.NewCheck("Daemon Connected", func(value bool) {
-		StopGnomon(Gnomes.Init)
+		menu.StopGnomon("dSlate")
 	})
 
 	walletCheckBox = widget.NewCheck("Wallet Connected", func(value bool) {
@@ -55,15 +57,19 @@ var (
 	})
 )
 
-func rpcLoginEdit() fyne.Widget { /// user:pass password entry
+// User:pass password entry
+func rpcLoginEdit() fyne.Widget {
 	rpcLoginInput.SetPlaceHolder("RPC user:pass")
 	rpcLoginInput.Resize(fyne.NewSize(360, 45))
 	rpcLoginInput.Move(fyne.NewPos(10, 650))
+	this_pass := binding.BindString(&rpc.Wallet.UserPass)
+	rpcLoginInput.Bind(this_pass)
 
 	return rpcLoginInput
 }
 
-func rpcWalletEdit() fyne.Widget { /// wallet rpc address entry
+// Wallet rpc address entry
+func rpcWalletEdit() fyne.Widget {
 	rpcWalletInput.SetPlaceHolder("Wallet RPC Address")
 	rpcWalletInput.Resize(fyne.NewSize(250, 45))
 	rpcWalletInput.Move(fyne.NewPos(10, 700))
@@ -71,9 +77,10 @@ func rpcWalletEdit() fyne.Widget { /// wallet rpc address entry
 	return rpcWalletInput
 }
 
-func rpcConnectButton() fyne.Widget { /// wallet connect button
+// Wallet connect button
+func rpcConnectButton() fyne.Widget {
 	button := widget.NewButton("Connect", func() { /// do on pressed
-		walletAddress = rpcWalletInput.Text
+		rpc.Wallet.Address = rpcWalletInput.Text
 		GetAddress()
 	})
 	button.Resize(fyne.NewSize(100, 42))
@@ -82,7 +89,8 @@ func rpcConnectButton() fyne.Widget { /// wallet connect button
 	return button
 }
 
-func daemonSelectOption() fyne.Widget { /// daemon select menu
+// Daemon select menu
+func daemonSelectOption() fyne.Widget {
 	dropDown.SetSelectedIndex(0)
 	dropDown.Resize(fyne.NewSize(180, 45))
 	dropDown.Move(fyne.NewPos(10, 550))
@@ -90,7 +98,8 @@ func daemonSelectOption() fyne.Widget { /// daemon select menu
 	return dropDown
 }
 
-func daemonConnectBox() fyne.Widget { /// daemon check box
+// Daemon check box
+func daemonConnectBox() fyne.Widget {
 	daemonCheckBox.Resize(fyne.NewSize(30, 30))
 	daemonCheckBox.Move(fyne.NewPos(3, 595))
 	daemonCheckBox.Disable()
@@ -98,7 +107,8 @@ func daemonConnectBox() fyne.Widget { /// daemon check box
 	return daemonCheckBox
 }
 
-func walletConnectBox() fyne.Widget { /// wallet check box
+// Wallet check box
+func walletConnectBox() fyne.Widget {
 	walletCheckBox.Resize(fyne.NewSize(30, 30))
 	walletCheckBox.Move(fyne.NewPos(3, 620))
 	walletCheckBox.Disable()
@@ -106,7 +116,8 @@ func walletConnectBox() fyne.Widget { /// wallet check box
 	return walletCheckBox
 }
 
-func heightDisplay() fyne.Widget { /// height display entry is read only
+// Height display entry is read only
+func heightDisplay() fyne.Widget {
 	currentHeight.SetText("Height:")
 	currentHeight.Disable()
 	currentHeight.Resize(fyne.NewSize(170, 45))
@@ -116,6 +127,7 @@ func heightDisplay() fyne.Widget { /// height display entry is read only
 
 }
 
+// Balance display entry is read only
 func balanceDisplay() fyne.Widget {
 	walletBalance.SetText("Balance:")
 	walletBalance.Disable()
@@ -126,7 +138,8 @@ func balanceDisplay() fyne.Widget {
 
 }
 
-func contractEdit() fyne.Widget { /// contract entry
+// SC entry
+func contractEdit() fyne.Widget {
 	contractInput.SetPlaceHolder("Enter Contract Id:")
 	contractInput.Resize(fyne.NewSize(360, 45))
 	contractInput.Move(fyne.NewPos(10, 15))
@@ -135,6 +148,7 @@ func contractEdit() fyne.Widget { /// contract entry
 	return contractInput
 }
 
+// Print SC code button
 func contractCode() fyne.Widget {
 	button := widget.NewButton("SC Code", func() {
 		if len(contractInput.Text) == 64 {
@@ -145,7 +159,8 @@ func contractCode() fyne.Widget {
 	return button
 }
 
-func searchButton() fyne.Widget { /// SC search button
+// SC search button
+func searchButton() fyne.Widget {
 	button := widget.NewButton("Search", func() {
 		log.Println("[dSlate] Searching for: " + contractInput.Text)
 		p := &dero.GetSC_Params{
@@ -160,7 +175,8 @@ func searchButton() fyne.Widget { /// SC search button
 	return button
 }
 
-func builtOnImage() fyne.CanvasObject { ///  main image
+// Main image
+func builtOnImage() fyne.CanvasObject {
 	img := canvas.NewImageFromResource(resourceBuiltOnDeroPng)
 	img.FillMode = canvas.ImageFillOriginal
 	img.Resize(fyne.NewSize(380, 540))
@@ -169,7 +185,8 @@ func builtOnImage() fyne.CanvasObject { ///  main image
 	return img
 }
 
-func cardImage() fyne.CanvasObject { /// card image
+// Card image
+func cardImage() fyne.CanvasObject {
 	img := canvas.NewImageFromResource(resourceDero1Png)
 	img.FillMode = canvas.ImageFillOriginal
 	img.Resize(fyne.NewSize(450, 330))
@@ -178,24 +195,26 @@ func cardImage() fyne.CanvasObject { /// card image
 	return img
 }
 
-func blankWidget() fyne.Widget { /// slate label
+// Blank slate label
+func blankWidget() fyne.Widget {
 	blank := widget.NewLabel("Something goes here...")
 	return blank
 }
 
+// Enable/Disable Gnomon radio group
 func enableGnomon() fyne.CanvasObject {
 	label := widget.NewLabel("Gnomon")
 	label.Alignment = fyne.TextAlignCenter
 	gnomonEnabled = widget.NewRadioGroup([]string{"On", "Off"}, func(s string) {
 		switch s {
 		case "On":
-			if daemonConnect {
-				go startGnomon(daemonAddress)
+			if rpc.Daemon.Connect {
+				go menu.StartGnomon("dSlate", []string{}, 0, 0, nil)
 			} else {
 				gnomonEnabled.SetSelected("Off")
 			}
 		case "Off":
-			StopGnomon(Gnomes.Init)
+			menu.StopGnomon("dSlate")
 		default:
 		}
 	})
@@ -208,6 +227,7 @@ func enableGnomon() fyne.CanvasObject {
 	return cont
 }
 
+// Gnomon search objects
 func gnomonOpts() fyne.CanvasObject {
 	label := widget.NewLabel("")
 	label.Wrapping = fyne.TextWrapWord
@@ -221,7 +241,7 @@ func gnomonOpts() fyne.CanvasObject {
 	soru.Horizontal = true
 
 	search := widget.NewButton("Search", func() {
-		if Gnomes.Init {
+		if menu.Gnomes.Init {
 			switch korv.Selected {
 			case "Key":
 				switch soru.Selected {
@@ -264,10 +284,7 @@ func gnomonOpts() fyne.CanvasObject {
 
 }
 
-type nfaAmt struct {
-	table.NumericalEntry
-}
-
+// NFA objects
 func nfaOpts() fyne.CanvasObject {
 	label := canvas.NewText("", color.White)
 	label.TextSize = 18
@@ -275,17 +292,16 @@ func nfaOpts() fyne.CanvasObject {
 	file_name := widget.NewEntry()
 	file_name.SetPlaceHolder("File Name:")
 
-	start := &nfaAmt{}
-	start.ExtendBaseWidget(start)
+	start := dwidget.DeroAmtEntry("", 1, 0)
 	start.SetPlaceHolder("Starting at #:")
 	start.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
-	limit := &nfaAmt{}
+	limit := dwidget.DeroAmtEntry("", 1, 0)
 	limit.ExtendBaseWidget(limit)
 	limit.SetPlaceHolder("Ending at #:")
 	limit.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
-	fee := &nfaAmt{}
+	fee := dwidget.DeroAmtEntry("", 1, 0)
 	fee.ExtendBaseWidget(fee)
 	fee.SetPlaceHolder("Fee:")
 	fee.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
@@ -316,7 +332,6 @@ func nfaOpts() fyne.CanvasObject {
 
 					name := file_name.Text
 					lim := rpc.StringToInt(limit.Text)
-					fe := rpc.StringToInt(fee.Text)
 					inc := rpc.StringToInt(start.Text)
 
 					log.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
@@ -350,21 +365,26 @@ func nfaOpts() fyne.CanvasObject {
 						}
 
 						file, err := os.ReadFile(path)
-
 						if err != nil {
 							log.Println("[dSlate]", err)
 							break
 						}
 
-						uploadContract(string(file), uint64(fe))
-						inc++
+						if tx := rpc.UploadNFAContract(string(file)); tx == "" {
+							label.Text = ("Error installing " + path)
+							break
+						} else {
+							log.Println("[dSlate] Confirming install TX")
+							rpc.ConfirmTx(tx, "dSlate", 45)
+						}
 
+						inc++
 						if inc > lim {
 							break
 						}
 
 						log.Println("[dSlate] Waiting for block")
-						time.Sleep(36 * time.Second)
+						time.Sleep(45 * time.Second)
 					}
 
 					label.Text = ""

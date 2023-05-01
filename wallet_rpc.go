@@ -15,21 +15,18 @@ const (
 	WALLET_SIMULATOR_DEFAULT = "127.0.0.1:30000"
 )
 
-var (
-	walletAddress string
-	walletConnect bool
-	passHash      [32]byte
-)
+var passHash [32]byte
 
-func GetAddress() error { /// get address with user:pass
-	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
+// Get wallet address with user:pass auth
+func GetAddress() error {
+	rpcClientW, ctx, cancel := rpc.SetWalletClient(rpc.Wallet.Address, rpc.Wallet.UserPass)
 	defer cancel()
 
 	var result *dero.GetAddress_Result
 	err := rpcClientW.CallFor(ctx, &result, "GetAddress")
 
 	if err != nil {
-		walletConnect = false
+		rpc.Wallet.Connect = false
 		walletCheckBox.SetChecked(false)
 		log.Println("[GetAddress]", err)
 		return nil
@@ -37,19 +34,19 @@ func GetAddress() error { /// get address with user:pass
 
 	address := len(result.Address)
 	if address == 66 {
-		walletConnect = true
+		rpc.Wallet.Connect = true
 		walletCheckBox.SetChecked(true)
 		log.Println("[dSlate] Wallet Connected")
 		log.Println("[dSlate] Dero Address: " + result.Address)
-		data := []byte(rpcLoginInput.Text)
-		passHash = sha256.Sum256(data)
+		passHash = sha256.Sum256([]byte(rpc.Wallet.UserPass))
 	}
 
 	return err
 }
 
-func GetBalance() error { /// get wallet balance
-	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
+// Get wallet Dero balance
+func GetBalance() error {
+	rpcClientW, ctx, cancel := rpc.SetWalletClient(rpc.Wallet.Address, rpc.Wallet.UserPass)
 	defer cancel()
 
 	var result *dero.GetBalance_Result
@@ -68,34 +65,9 @@ func GetBalance() error { /// get wallet balance
 	return err
 }
 
-func uploadContract(code string, fee uint64) error { /// install new contract
-	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
-	defer cancel()
-
-	txid := dero.Transfer_Result{}
-
-	params := &dero.Transfer_Params{
-		Transfers: []dero.Transfer{},
-		SC_Code:   code,
-		SC_Value:  0,
-		SC_RPC:    dero.Arguments{},
-		Ringsize:  2,
-		Fees:      fee,
-	}
-
-	err := rpcClientW.CallFor(ctx, &txid, "transfer", params)
-	if err != nil {
-		log.Println("[uploadContract]", err)
-		return nil
-	}
-
-	log.Println("[uploadContract] TXID:", txid)
-
-	return err
-}
-
-func updateContract(scid, code string, fee uint64) error { /// update existing contracts with 'UpdateCode' entrypoint
-	rpcClientW, ctx, cancel := rpc.SetWalletClient(walletAddress, rpcLoginInput.Text)
+// Update existing contracts with 'UpdateCode' entrypoint
+func updateContract(scid, code string, fee uint64) error {
+	rpcClientW, ctx, cancel := rpc.SetWalletClient(rpc.Wallet.Address, rpc.Wallet.UserPass)
 	defer cancel()
 
 	arg1 := dero.Argument{Name: "entrypoint", DataType: "S", Value: "UpdateCode"}
@@ -104,7 +76,7 @@ func updateContract(scid, code string, fee uint64) error { /// update existing c
 	txid := dero.Transfer_Result{}
 
 	var addr string
-	switch daemonAddress {
+	switch rpc.Daemon.Rpc {
 	case "127.0.0.1:10102":
 		addr = "dero1qyr8yjnu6cl2c5yqkls0hmxe6rry77kn24nmc5fje6hm9jltyvdd5qq4hn5pn"
 	case "127.0.0.1:40102":

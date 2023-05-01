@@ -3,23 +3,27 @@ package main
 import (
 	"crypto/sha256"
 	"log"
+
+	"github.com/SixofClubsss/dReams/rpc"
 )
 
-func whichDaemon(s string) { /// select menu changes dameon address
+// Select menu changes dameon address
+func whichDaemon(s string) {
 	switch s {
 	case "TESTNET":
-		daemonAddress = "127.0.0.1:40102"
+		rpc.Daemon.Rpc = "127.0.0.1:40102"
 	case "SIMULATOR":
-		daemonAddress = "127.0.0.1:20000"
+		rpc.Daemon.Rpc = "127.0.0.1:20000"
 	case "CUSTOM":
 		confirmPopUp() /// enter custom address in new window
 	default:
-		daemonAddress = "127.0.0.1:10102"
+		rpc.Daemon.Rpc = "127.0.0.1:10102"
 	}
 }
 
-func isDaemonConnected() { /// check if daemon is connected
-	if daemonConnect {
+// Check if daemon is connected
+func isDaemonConnected() {
+	if rpc.Daemon.Connect {
 		if !daemonCheckBox.Checked {
 			log.Println("[dSlate] Daemon RPC Connected")
 		}
@@ -36,8 +40,9 @@ func isDaemonConnected() { /// check if daemon is connected
 	}
 }
 
-func isWalletConnected() { /// check if wallet is connected
-	if walletConnect {
+// Check if wallet is connected
+func isWalletConnected() {
+	if rpc.Wallet.Connect {
 		if !walletCheckBox.Checked {
 			log.Println("[dSlate] Wallet RPC Connected")
 			walletCheckBox.SetChecked(true)
@@ -50,28 +55,29 @@ func isWalletConnected() { /// check if wallet is connected
 		}
 		if walletCheckBox.Checked {
 			walletCheckBox.SetChecked(false)
-			walletConnect = false
+			rpc.Wallet.Connect = false
 		}
 	}
 
 	if walletCheckBox.Checked { /// if wallet is connected and any changes to inputs, show disconnected
 		checkPass()
-		if rpcWalletInput.Text != walletAddress {
+		if rpcWalletInput.Text != rpc.Wallet.Address {
 			walletBalance.SetText("Balance: ")
-			walletAddress = ""
+			rpc.Wallet.Address = ""
 			walletCheckBox.SetChecked(false)
-			walletConnect = false
+			rpc.Wallet.Connect = false
 		}
 	}
 }
 
-func checkPass() { /// check if user:pass has changed
+// Check if user:pass has changed
+func checkPass() {
 	data := []byte(rpcLoginInput.Text)
 	hash := sha256.Sum256(data)
 
 	if hash != passHash {
 		walletBalance.SetText("Balance: ")
 		walletCheckBox.SetChecked(false)
-		walletConnect = false
+		rpc.Wallet.Connect = false
 	}
 }

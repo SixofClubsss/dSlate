@@ -10,6 +10,8 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"github.com/SixofClubsss/dReams/menu"
+	"github.com/SixofClubsss/dReams/rpc"
 )
 
 const (
@@ -46,8 +48,10 @@ func main() {
 
 }
 
-func init() { /// Handle ctrl-c close
-	c := make(chan os.Signal)
+// Handle ctrl-c close
+func init() {
+	menu.Gnomes.Fast = true
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
@@ -58,19 +62,20 @@ func init() { /// Handle ctrl-c close
 	}()
 }
 
-func fetchLoop() { /// ping daemon and get height loop
+// Main loop, ping daemon, get height check connection status and update Gnomon endpoint
+func fetchLoop() {
 	var ticker = time.NewTicker(6 * time.Second)
 	quit = make(chan struct{})
 	go func() {
 		for {
 			select {
 			case <-ticker.C: /// do on interval
-				Ping()
+				rpc.Ping()
 				isDaemonConnected()
 				isWalletConnected()
 				GetHeight()
-				if Gnomes.Init {
-					Gnomes.Indexer.Endpoint = daemonAddress
+				if menu.Gnomes.Init {
+					menu.Gnomes.Indexer.Endpoint = rpc.Daemon.Rpc
 				}
 			case <-quit: /// exit loop
 				log.Println("[dSlate] Exiting...")
