@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"log"
 	"os"
 	"os/signal"
@@ -10,6 +11,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"github.com/SixofClubsss/dReams/bundle"
 	"github.com/SixofClubsss/dReams/menu"
 	"github.com/SixofClubsss/dReams/rpc"
 )
@@ -30,6 +32,7 @@ var (
 )
 
 func main() {
+	myApp.Settings().SetTheme(bundle.DeroTheme(color.Black))
 	myWindow = myApp.NewWindow("dSlate") /// start main app
 	myWindow.SetMaster()                 /// if main closes, all windows close
 	myWindow.Resize(fyne.NewSize(MIN_WIDTH, MIN_HEIGHT))

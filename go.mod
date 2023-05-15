@@ -1,32 +1,33 @@
 module github.com/SixofClubsss/dSlate
 
-go 1.19
+go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.3.1
-	github.com/SixofClubsss/dReams v0.9.5
-	github.com/deroproject/derohe v0.0.0-20230219151438-e855701f67c9
+	github.com/SixofClubsss/dReams v0.9.6-0.20230506085218-c1a541aadc62
+	github.com/deroproject/derohe v0.0.0-20230319083715-8d446afdaef8
 )
 
 require (
-	fyne.io/systray v1.10.1-0.20230207085535-4a244dbb9d03 // indirect
-	fyne.io/x/fyne v0.0.0-20230128220048-43a1c4cd1ed8 // indirect
+	fyne.io/systray v1.10.1-0.20230312215936-7f71b037e260 // indirect
+	fyne.io/x/fyne v0.0.0-20230411205836-1ca0ead20763 // indirect
 	github.com/benoitkugler/textlayout v0.3.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/civilware/Gnomon v0.0.0-20230130224610-7e5b7651ce52 // indirect
-	github.com/creachadair/jrpc2 v0.43.0 // indirect
+	github.com/creachadair/jrpc2 v1.0.1 // indirect
+	github.com/creachadair/mds v0.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dchest/siphash v1.2.3 // indirect
 	github.com/deroproject/graviton v0.0.0-20220130070622-2c248a53b2e1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/fredbi/uri v0.1.0 // indirect
+	github.com/fredbi/uri v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
-	github.com/fyne-io/gl-js v0.0.0-20220119005834-d2da28d9ccfe // indirect
-	github.com/fyne-io/glfw-js v0.0.0-20220120001248-ee7290d23504 // indirect
-	github.com/fyne-io/image v0.0.0-20220602074514-4956b0afb3d2 // indirect
+	github.com/fyne-io/gl-js v0.0.0-20230506162202-1fdaa286a934 // indirect
+	github.com/fyne-io/glfw-js v0.0.0-20220517201726-bebc2019cd33 // indirect
+	github.com/fyne-io/image v0.0.0-20221020213044-f609c6a24345 // indirect
 	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -52,8 +53,8 @@ require (
 	github.com/superoo7/go-gecko v1.0.0 // indirect
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	github.com/ybbus/jsonrpc/v3 v3.1.1 // indirect
-	github.com/yuin/goldmark v1.4.0 // indirect
+	github.com/ybbus/jsonrpc/v3 v3.1.4 // indirect
+	github.com/yuin/goldmark v1.4.13 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
@@ -61,9 +62,9 @@ require (
 	golang.org/x/image v0.0.0-20220601225756-64ec528b34cd // indirect
 	golang.org/x/mobile v0.0.0-20211207041440-4e6c2922fdee // indirect
 	golang.org/x/net v0.4.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/js/dom v0.0.0-20210725211120-f030747120f2 // indirect
