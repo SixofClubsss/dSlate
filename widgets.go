@@ -14,6 +14,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/SixofClubsss/dReams/dwidget"
@@ -80,7 +81,7 @@ func rpcWalletEdit() fyne.Widget {
 // Wallet connect button
 func rpcConnectButton() fyne.Widget {
 	button := widget.NewButton("Connect", func() { /// do on pressed
-		rpc.Wallet.Address = rpcWalletInput.Text
+		rpc.Wallet.Rpc = rpcWalletInput.Text
 		GetAddress()
 	})
 	button.Resize(fyne.NewSize(100, 42))
@@ -318,96 +319,103 @@ func nfaOpts() fyne.CanvasObject {
 
 	var install fyne.Widget
 	install = widget.NewButton("Install Nfas", func() {
-		go func() {
-			if fee.Validate() == nil && limit.Validate() == nil && start.Validate() == nil {
-				if !process_on {
-					process_on = true
-					install.Hide()
-					stop.Show()
-					file_name.Disable()
-					start.Disable()
-					limit.Disable()
-					fee.Disable()
-					extension.Disable()
-
-					name := file_name.Text
-					lim := rpc.StringToInt(limit.Text)
-					inc := rpc.StringToInt(start.Text)
-
-					log.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
-
-					for i := 10; i > 0; i-- {
-						if kill_process {
-							break
-						}
-
-						label.Text = "Starting install loop in " + strconv.Itoa(i)
-						label.Refresh()
-						time.Sleep(1 * time.Second)
-					}
-
-					label.Text = ""
-					label.Refresh()
-
-					for {
-						if kill_process {
-							break
-						}
-
-						path := name + strconv.Itoa(inc) + ".bas"
-						if _, err := os.Stat(path); err == nil {
-							log.Println("[dSlate] Installing", path)
-							label.Text = "Installing " + path
-							label.Refresh()
-						} else if errors.Is(err, os.ErrNotExist) {
-							log.Println("[dSlate]", path, "Not Found")
-							break
-						}
-
-						file, err := os.ReadFile(path)
-						if err != nil {
-							log.Println("[dSlate]", err)
-							break
-						}
-
-						if tx := rpc.UploadNFAContract(string(file)); tx == "" {
-							label.Text = ("Error installing " + path)
-							break
-						} else {
-							log.Println("[dSlate] Confirming install TX")
-							rpc.ConfirmTx(tx, "dSlate", 45)
-						}
-
-						inc++
-						if inc > lim {
-							break
-						}
-
-						log.Println("[dSlate] Waiting for block")
-						time.Sleep(45 * time.Second)
-					}
-
-					label.Text = ""
-					label.Refresh()
-					install.Show()
-					stop.Hide()
-					file_name.Enable()
-					start.Enable()
-					limit.Enable()
-					fee.Enable()
-					extension.Enable()
-					process_on = false
-					kill_process = false
-					log.Println("[dSlate] Install loop complete")
-
-				} else {
-					log.Println("[dSlate] Install already running")
-				}
-			} else {
-				stop.Hide()
-				log.Println("[dSlate] Install entries not valid")
+		if rpc.Wallet.Connect && rpc.Daemon.Connect {
+			if rpc.Wallet.Address == "" || len(rpc.Wallet.Address) != 66 || rpc.Wallet.Address[0:4] != "deto" {
+				dialog.NewInformation("Error", "Check wallet connection\n\ndSlate installs to testnet only", myWindow).Show()
+				return
 			}
-		}()
+
+			go func() {
+				if fee.Validate() == nil && limit.Validate() == nil && start.Validate() == nil {
+					if !process_on {
+						process_on = true
+						install.Hide()
+						stop.Show()
+						file_name.Disable()
+						start.Disable()
+						limit.Disable()
+						fee.Disable()
+						extension.Disable()
+
+						name := file_name.Text
+						lim := rpc.StringToInt(limit.Text)
+						inc := rpc.StringToInt(start.Text)
+
+						log.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
+
+						for i := 10; i > 0; i-- {
+							if kill_process {
+								break
+							}
+
+							label.Text = "Starting install loop in " + strconv.Itoa(i)
+							label.Refresh()
+							time.Sleep(1 * time.Second)
+						}
+
+						label.Text = ""
+						label.Refresh()
+
+						for {
+							if kill_process {
+								break
+							}
+
+							path := name + strconv.Itoa(inc) + ".bas"
+							if _, err := os.Stat(path); err == nil {
+								log.Println("[dSlate] Installing", path)
+								label.Text = "Installing " + path
+								label.Refresh()
+							} else if errors.Is(err, os.ErrNotExist) {
+								log.Println("[dSlate]", path, "Not Found")
+								break
+							}
+
+							file, err := os.ReadFile(path)
+							if err != nil {
+								log.Println("[dSlate]", err)
+								break
+							}
+
+							if tx := uploadNFA(string(file)); tx == "" {
+								label.Text = ("Error installing " + path)
+								break
+							} else {
+								log.Println("[dSlate] Confirming install TX")
+								rpc.ConfirmTx(tx, "dSlate", 45)
+							}
+
+							inc++
+							if inc > lim {
+								break
+							}
+
+							log.Println("[dSlate] Waiting for block")
+							time.Sleep(6 * time.Second)
+						}
+
+						label.Text = ""
+						label.Refresh()
+						install.Show()
+						stop.Hide()
+						file_name.Enable()
+						start.Enable()
+						limit.Enable()
+						fee.Enable()
+						extension.Enable()
+						process_on = false
+						kill_process = false
+						log.Println("[dSlate] Install loop complete")
+
+					} else {
+						log.Println("[dSlate] Install already running")
+					}
+				} else {
+					stop.Hide()
+					log.Println("[dSlate] Install entries not valid")
+				}
+			}()
+		}
 	})
 
 	update := widget.NewButton("Update Contract", func() {

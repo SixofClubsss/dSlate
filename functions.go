@@ -61,7 +61,7 @@ func isWalletConnected() {
 
 	if walletCheckBox.Checked { /// if wallet is connected and any changes to inputs, show disconnected
 		checkPass()
-		if rpcWalletInput.Text != rpc.Wallet.Address {
+		if rpcWalletInput.Text != rpc.Wallet.Rpc {
 			walletBalance.SetText("Balance: ")
 			rpc.Wallet.Address = ""
 			walletCheckBox.SetChecked(false)

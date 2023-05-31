@@ -18,34 +18,29 @@ const (
 )
 
 // Gets current height and displays
-func GetHeight() error {
+func GetHeight() {
 	rpcClientD, ctx, cancel := rpc.SetDaemonClient(rpc.Daemon.Rpc)
 	defer cancel()
 
 	var result *dero.Daemon_GetHeight_Result
-	err := rpcClientD.CallFor(ctx, &result, "DERO.GetHeight")
-
-	if err != nil {
-		return nil
+	if err := rpcClientD.CallFor(ctx, &result, "DERO.GetHeight"); err != nil {
+		return
 	}
+
 	h := result.Height
 	str := strconv.FormatUint(h, 10)
 	currentHeight.SetText("Height: " + str)
-
-	return err
 }
 
 // Search SC using getsc method
-func getSC(p *dero.GetSC_Params) error {
+func getSC(p *dero.GetSC_Params) {
 	rpcClientD, ctx, cancel := rpc.SetDaemonClient(rpc.Daemon.Rpc)
 	defer cancel()
 
 	var result *dero.GetSC_Result
-	err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", p)
-
-	if err != nil {
+	if err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", p); err != nil {
 		log.Println("[getSC]", err)
-		return nil
+		return
 	}
 
 	bal := result.Balances /// retrieve all sc balances
@@ -58,11 +53,10 @@ func getSC(p *dero.GetSC_Params) error {
 
 	go searchPopUp(balances, string_keys, uint_keys, result.Code) /// displays results
 
-	return err
 }
 
-// Get sSC code and print in terminal
-func getSCcode(scid string) error {
+// Get SC code and print result in terminal
+func getSCcode(scid string) {
 	rpcClientD, ctx, cancel := rpc.SetDaemonClient(rpc.Daemon.Rpc)
 	defer cancel()
 
@@ -72,16 +66,13 @@ func getSCcode(scid string) error {
 		Code:      true,
 		Variables: false,
 	}
-	err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", params)
 
-	if err != nil {
+	if err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", params); err != nil {
 		log.Println("[getSCcode]", err)
-		return nil
+		return
 	}
 
 	fmt.Println(result.Code)
-
-	return err
 }
 
 // Switch for interface type to string

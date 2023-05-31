@@ -4,14 +4,13 @@ go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.3.1
-	github.com/SixofClubsss/dReams v0.9.6-0.20230506085218-c1a541aadc62
-	github.com/deroproject/derohe v0.0.0-20230319083715-8d446afdaef8
+	github.com/SixofClubsss/dReams v0.9.6
+	github.com/deroproject/derohe v0.0.0-20230528153107-466c94e98c50
 )
 
 require (
-	fyne.io/systray v1.10.1-0.20230312215936-7f71b037e260 // indirect
-	fyne.io/x/fyne v0.0.0-20230411205836-1ca0ead20763 // indirect
-	github.com/benoitkugler/textlayout v0.3.0 // indirect
+	fyne.io/systray v1.10.1-0.20230403195833-7dc3c09283d6 // indirect
+	fyne.io/x/fyne v0.0.0-20230527115803-2bc5e346c12d // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
@@ -32,7 +31,7 @@ require (
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/zapr v1.2.3 // indirect
-	github.com/go-text/typesetting v0.0.0-20221212183139-1eb938670a1f // indirect
+	github.com/go-text/typesetting v0.0.0-20230405155246-bf9c697c6e16 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/goki/freetype v0.0.0-20220119013949-7a161fd3728c // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
@@ -59,7 +58,7 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
-	golang.org/x/image v0.0.0-20220601225756-64ec528b34cd // indirect
+	golang.org/x/image v0.3.0 // indirect
 	golang.org/x/mobile v0.0.0-20211207041440-4e6c2922fdee // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
