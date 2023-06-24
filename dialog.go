@@ -6,7 +6,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/SixofClubsss/dReams/rpc"
+	"github.com/dReam-dApps/dReams/rpc"
 )
 
 // Pop up for entering custom daemon address
@@ -21,7 +21,11 @@ func confirmPopUp() {
 
 	confirm := widget.NewButton("Enter", func() {
 		rpc.Daemon.Rpc = custom_input.Text
-		log.Println("[dSlate] Daemon Set To: CUSTOM")
+		rpc.Ping()
+		if rpc.Daemon.IsConnected() {
+			log.Println("[dSlate] Daemon Set To: CUSTOM")
+			cw.Close()
+		}
 	})
 
 	content := container.NewBorder(

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/SixofClubsss/dReams/rpc"
+	"github.com/dReam-dApps/dReams/rpc"
 	dero "github.com/deroproject/derohe/rpc"
 )
 

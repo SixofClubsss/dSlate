@@ -4,10 +4,10 @@ import (
 	"crypto/sha256"
 	"log"
 
-	"github.com/SixofClubsss/dReams/rpc"
+	"github.com/dReam-dApps/dReams/rpc"
 )
 
-// Select menu changes dameon address
+// Select menu changes daemon address
 func whichDaemon(s string) {
 	switch s {
 	case "TESTNET":

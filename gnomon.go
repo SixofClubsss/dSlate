@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/SixofClubsss/dReams/menu"
+	"github.com/dReam-dApps/dReams/menu"
 )
 
 func searchByKey(scid string, key string, s bool) string {
@@ -13,12 +13,12 @@ func searchByKey(scid string, key string, s bool) string {
 		var uValue []uint64
 
 		if s {
-			sValue, uValue = menu.Gnomes.Indexer.Backend.GetSCIDValuesByKey(scid, key, menu.Gnomes.Indexer.ChainHeight, true)
+			sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, key)
 		} else {
 			if i, err := strconv.Atoi(key); err != nil {
 				log.Println("[dSlate]", err)
 			} else {
-				sValue, uValue = menu.Gnomes.Indexer.Backend.GetSCIDValuesByKey(scid, uint64(i), menu.Gnomes.Indexer.ChainHeight, true)
+				sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, uint64(i))
 			}
 		}
 
@@ -39,12 +39,12 @@ func searchByValue(scid string, value string, s bool) string {
 		var sValue []string
 		var uValue []uint64
 		if s {
-			sValue, uValue = menu.Gnomes.Indexer.Backend.GetSCIDKeysByValue(scid, value, menu.Gnomes.Indexer.ChainHeight, true)
+			sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, value)
 		} else {
 			if i, err := strconv.Atoi(value); err != nil {
 				log.Println("[dSlate]", err)
 			} else {
-				sValue, uValue = menu.Gnomes.Indexer.Backend.GetSCIDKeysByValue(scid, uint64(i), menu.Gnomes.Indexer.ChainHeight, true)
+				sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, uint64(i))
 			}
 		}
 

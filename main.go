@@ -11,9 +11,9 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"github.com/SixofClubsss/dReams/bundle"
-	"github.com/SixofClubsss/dReams/menu"
-	"github.com/SixofClubsss/dReams/rpc"
+	"github.com/dReam-dApps/dReams/bundle"
+	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/rpc"
 )
 
 const (

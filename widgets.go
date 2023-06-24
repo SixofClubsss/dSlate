@@ -17,9 +17,9 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"github.com/SixofClubsss/dReams/dwidget"
-	"github.com/SixofClubsss/dReams/menu"
-	"github.com/SixofClubsss/dReams/rpc"
+	"github.com/dReam-dApps/dReams/dwidget"
+	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/rpc"
 	dero "github.com/deroproject/derohe/rpc"
 	"github.com/deroproject/derohe/walletapi"
 )
@@ -37,7 +37,7 @@ var (
 	contractInput  = widget.NewMultiLineEntry()
 
 	daemonCheckBox = widget.NewCheck("Daemon Connected", func(value bool) {
-		menu.StopGnomon("dSlate")
+		menu.Gnomes.Stop("dSlate")
 	})
 
 	walletCheckBox = widget.NewCheck("Wallet Connected", func(value bool) {
@@ -210,12 +210,12 @@ func enableGnomon() fyne.CanvasObject {
 		switch s {
 		case "On":
 			if rpc.Daemon.Connect {
-				go menu.StartGnomon("dSlate", []string{}, 0, 0, nil)
+				go menu.StartGnomon("dSlate", "boltdb", []string{}, 0, 0, nil)
 			} else {
 				gnomonEnabled.SetSelected("Off")
 			}
 		case "Off":
-			menu.StopGnomon("dSlate")
+			menu.Gnomes.Stop("dSlate")
 		default:
 		}
 	})
