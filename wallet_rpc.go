@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"log"
 	"strconv"
 
 	"github.com/dReam-dApps/dReams/rpc"
@@ -27,7 +26,7 @@ func GetAddress() {
 		rpc.Wallet.Connect = false
 		rpc.Wallet.Rpc = ""
 		walletCheckBox.SetChecked(false)
-		log.Println("[GetAddress]", err)
+		logger.Errorln("[GetAddress]", err)
 		return
 	}
 
@@ -35,8 +34,8 @@ func GetAddress() {
 		rpc.Wallet.Connect = true
 		rpc.Wallet.Address = result.Address
 		walletCheckBox.SetChecked(true)
-		log.Println("[dSlate] Wallet Connected")
-		log.Println("[dSlate] Dero Address: " + result.Address)
+		logger.Println("[dSlate] Wallet Connected")
+		logger.Println("[dSlate] Dero Address: " + result.Address)
 		passHash = sha256.Sum256([]byte(rpc.Wallet.UserPass))
 	}
 }
@@ -48,7 +47,7 @@ func GetBalance() {
 
 	var result *dero.GetBalance_Result
 	if err := rpcClientW.CallFor(ctx, &result, "GetBalance"); err != nil {
-		log.Println("[GetBalance]", err)
+		logger.Errorln("[GetBalance]", err)
 		return
 	}
 
@@ -96,11 +95,11 @@ func updateContract(scid, code string, fee uint64) (tx string) {
 	}
 
 	if err := rpcClientW.CallFor(ctx, &txid, "transfer", params); err != nil {
-		log.Println("[updateContract]", err)
+		logger.Errorln("[updateContract]", err)
 		return
 	}
 
-	log.Println("[updateContract] Update TX:", txid)
+	logger.Println("[updateContract] Update TX:", txid)
 
 	return
 }
@@ -125,11 +124,11 @@ func uploadNFA(code string) (tx string) {
 	}
 
 	if err := rpcClientW.CallFor(ctx, &txid, "transfer", params); err != nil {
-		log.Println("[uploadNFA]", err)
+		logger.Errorln("[uploadNFA]", err)
 		return
 	}
 
-	log.Println("[uploadNFA] TXID:", txid)
+	logger.Println("[uploadNFA] TXID:", txid)
 
 	return txid.TXID
 }

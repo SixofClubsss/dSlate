@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -23,7 +21,7 @@ func confirmPopUp() {
 		rpc.Daemon.Rpc = custom_input.Text
 		rpc.Ping()
 		if rpc.Daemon.IsConnected() {
-			log.Println("[dSlate] Daemon Set To: CUSTOM")
+			logger.Println("[dSlate] Daemon Set To: CUSTOM")
 			cw.Close()
 		}
 	})

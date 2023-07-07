@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"image/color"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -29,7 +28,7 @@ var (
 	primes   = []string{"MAINNET", "TESTNET", "SIMULATOR", "CUSTOM"} /// set select menu
 	dropDown = widget.NewSelect(primes, func(s string) {             /// do when select changes
 		whichDaemon(s)
-		log.Println("[dSlate] Daemon Set To:", s)
+		logger.Println("[dSlate] Daemon Set To:", s)
 	})
 
 	rpcLoginInput  = widget.NewPasswordEntry()
@@ -163,7 +162,7 @@ func contractCode() fyne.Widget {
 // SC search button
 func searchButton() fyne.Widget {
 	button := widget.NewButton("Search", func() {
-		log.Println("[dSlate] Searching for: " + contractInput.Text)
+		logger.Println("[dSlate] Searching for: " + contractInput.Text)
 		p := &dero.GetSC_Params{
 			SCID:      contractInput.Text,
 			Code:      true,
@@ -247,30 +246,30 @@ func gnomonOpts() fyne.CanvasObject {
 			case "Key":
 				switch soru.Selected {
 				case "String":
-					log.Println("[dSlate] Search results for string key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, true))
+					logger.Println("[dSlate] Search results for string key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, true))
 					label.SetText(searchByKey(contractInput.Text, kv_entry.Text, true))
 				case "Uint64":
-					log.Println("[dSlate] Search results for uint64 key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, false))
+					logger.Println("[dSlate] Search results for uint64 key "+kv_entry.Text+" on SCID "+contractInput.Text, searchByKey(contractInput.Text, kv_entry.Text, false))
 					label.SetText(searchByKey(contractInput.Text, kv_entry.Text, false))
 				default:
-					log.Println("[dSlate] Select string or uint64")
+					logger.Println("[dSlate] Select string or uint64")
 				}
 			case "Value":
 				switch soru.Selected {
 				case "String":
-					log.Println("[dSlate] Search results for string value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, true))
+					logger.Println("[dSlate] Search results for string value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, true))
 					label.SetText(searchByValue(contractInput.Text, kv_entry.Text, true))
 				case "Uint64":
-					log.Println("[dSlate] Search results for uint64 value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, false))
+					logger.Println("[dSlate] Search results for uint64 value "+kv_entry.Text+" on SCID "+contractInput.Text, searchByValue(contractInput.Text, kv_entry.Text, false))
 					label.SetText(searchByValue(contractInput.Text, kv_entry.Text, false))
 				default:
-					log.Println("[dSlate] Select string or uint64")
+					logger.Println("[dSlate] Select string or uint64")
 				}
 			default:
-				log.Println("[dSlate] Select key or value")
+				logger.Println("[dSlate] Select key or value")
 			}
 		} else {
-			log.Println("[dSlate] Gnomon not initialized")
+			logger.Println("[dSlate] Gnomon not initialized")
 		}
 
 	})
@@ -293,22 +292,22 @@ func nfaOpts() fyne.CanvasObject {
 	file_name := widget.NewEntry()
 	file_name.SetPlaceHolder("File Name:")
 
-	start := dwidget.DeroAmtEntry("", 1, 0)
+	start := dwidget.NewDeroEntry("", 1, 0)
 	start.SetPlaceHolder("Starting at #:")
 	start.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
-	limit := dwidget.DeroAmtEntry("", 1, 0)
+	limit := dwidget.NewDeroEntry("", 1, 0)
 	limit.ExtendBaseWidget(limit)
 	limit.SetPlaceHolder("Ending at #:")
 	limit.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
-	fee := dwidget.DeroAmtEntry("", 1, 0)
+	fee := dwidget.NewDeroEntry("", 1, 0)
 	fee.ExtendBaseWidget(fee)
 	fee.SetPlaceHolder("Fee:")
 	fee.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
 	stop := widget.NewButton("Stop Loop", func() {
-		log.Println("[dSlate] Stopping install loop")
+		logger.Println("[dSlate] Stopping install loop")
 		label.Text = "Stopping install loop..."
 		label.Refresh()
 		kill_process = true
@@ -318,7 +317,7 @@ func nfaOpts() fyne.CanvasObject {
 	extension.PlaceHolder = "ext"
 
 	var install fyne.Widget
-	install = widget.NewButton("Install Nfas", func() {
+	install = widget.NewButton("Install NFAs", func() {
 		if rpc.Wallet.Connect && rpc.Daemon.Connect {
 			if rpc.Wallet.Address == "" || len(rpc.Wallet.Address) != 66 || rpc.Wallet.Address[0:4] != "deto" {
 				dialog.NewInformation("Error", "Check wallet connection\n\ndSlate installs to testnet only", myWindow).Show()
@@ -341,7 +340,7 @@ func nfaOpts() fyne.CanvasObject {
 						lim := rpc.StringToInt(limit.Text)
 						inc := rpc.StringToInt(start.Text)
 
-						log.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
+						logger.Println("[dSlate] Starting install loop for", name+strconv.Itoa(inc)+".bas", "to", name+strconv.Itoa(lim)+".bas")
 
 						for i := 10; i > 0; i-- {
 							if kill_process {
@@ -363,17 +362,17 @@ func nfaOpts() fyne.CanvasObject {
 
 							path := name + strconv.Itoa(inc) + ".bas"
 							if _, err := os.Stat(path); err == nil {
-								log.Println("[dSlate] Installing", path)
+								logger.Println("[dSlate] Installing", path)
 								label.Text = "Installing " + path
 								label.Refresh()
 							} else if errors.Is(err, os.ErrNotExist) {
-								log.Println("[dSlate]", path, "Not Found")
+								logger.Errorln("[dSlate]", path, "Not Found")
 								break
 							}
 
 							file, err := os.ReadFile(path)
 							if err != nil {
-								log.Println("[dSlate]", err)
+								logger.Errorln("[dSlate]", err)
 								break
 							}
 
@@ -381,7 +380,7 @@ func nfaOpts() fyne.CanvasObject {
 								label.Text = ("Error installing " + path)
 								break
 							} else {
-								log.Println("[dSlate] Confirming install TX")
+								logger.Println("[dSlate] Confirming install TX")
 								rpc.ConfirmTx(tx, "dSlate", 45)
 							}
 
@@ -390,7 +389,7 @@ func nfaOpts() fyne.CanvasObject {
 								break
 							}
 
-							log.Println("[dSlate] Waiting for block")
+							logger.Println("[dSlate] Waiting for block")
 							time.Sleep(6 * time.Second)
 						}
 
@@ -405,14 +404,14 @@ func nfaOpts() fyne.CanvasObject {
 						extension.Enable()
 						process_on = false
 						kill_process = false
-						log.Println("[dSlate] Install loop complete")
+						logger.Println("[dSlate] Install loop complete")
 
 					} else {
-						log.Println("[dSlate] Install already running")
+						logger.Println("[dSlate] Install already running")
 					}
 				} else {
 					stop.Hide()
-					log.Println("[dSlate] Install entries not valid")
+					logger.Println("[dSlate] Install entries not valid")
 				}
 			}()
 		}
@@ -421,11 +420,11 @@ func nfaOpts() fyne.CanvasObject {
 	update := widget.NewButton("Update Contract", func() {
 		path := file_name.Text
 		if _, err := os.Stat(path); err == nil {
-			log.Println("[dSlate] Update Path", path)
+			logger.Println("[dSlate] Update Path", path)
 			file, err := os.ReadFile(path)
 
 			if err != nil {
-				log.Println("[dSlate]", err)
+				logger.Errorln("[dSlate]", err)
 				return
 			}
 			code := string(file)
@@ -433,11 +432,11 @@ func nfaOpts() fyne.CanvasObject {
 				fe := rpc.StringToInt(fee.Text)
 				updateContract(contractInput.Text, string(file), uint64(fe))
 			} else {
-				log.Println("[dSlate] Failed to update, code is empty string")
+				logger.Errorln("[dSlate] Failed to update, code is empty string")
 			}
 
 		} else if errors.Is(err, os.ErrNotExist) {
-			log.Println("[dSlate]", path, "Not Found")
+			logger.Errorln("[dSlate]", path, "Not Found")
 		}
 
 	})
@@ -455,21 +454,21 @@ func nfaOpts() fyne.CanvasObject {
 			output_file := strings.TrimSuffix(input_file, ".sign")
 
 			if data, err := os.ReadFile(input_file); err != nil {
-				log.Println("[dSlate] Cannot read input file", err)
+				logger.Errorln("[dSlate] Cannot read input file", err)
 			} else if signer, message, err := wf.CheckSignature(data); err != nil {
-				log.Println("[dSlate] Signature verify failed", input_file, err)
+				logger.Errorln("[dSlate] Signature verify failed", input_file, err)
 			} else {
-				log.Println("[dSlate] Signed by", "address", signer.String())
+				logger.Println("[dSlate] Signed by", "address", signer.String())
 
 				if os.WriteFile(output_file, message, 0600); err != nil {
-					log.Println("[dSlate] Cannot write output file", output_file, err)
+					logger.Errorln("[dSlate] Cannot write output file", output_file, err)
 				}
-				log.Println("[dSlate] Successfully wrote message to file. please check", "file", output_file)
+				logger.Println("[dSlate] Successfully wrote message to file. please check", "file", output_file)
 			}
 
 			wf.Close_Encrypted_Wallet()
 		} else {
-			log.Println("[dSlate] Wallet", err)
+			logger.Errorln("[dSlate] Wallet", err)
 		}
 	})
 
@@ -492,7 +491,7 @@ func nfaOpts() fyne.CanvasObject {
 						lim := rpc.StringToInt(limit.Text)
 						inc := rpc.StringToInt(start.Text)
 
-						log.Println("[dSlate] Starting sign loop for", input+strconv.Itoa(inc)+ext, "to", input+strconv.Itoa(lim)+ext)
+						logger.Println("[dSlate] Starting sign loop for", input+strconv.Itoa(inc)+ext, "to", input+strconv.Itoa(lim)+ext)
 
 						for i := 10; i > 0; i-- {
 							if kill_process {
@@ -516,13 +515,13 @@ func nfaOpts() fyne.CanvasObject {
 							output_file := input_file + ".sign"
 
 							if data, err := os.ReadFile(input_file); err != nil {
-								log.Println("[dSlate] Cannot read input file", err)
+								logger.Errorln("[dSlate] Cannot read input file", err)
 								break
 							} else if err := os.WriteFile(output_file, wf.SignData(data), 0600); err != nil {
-								log.Println("[dSlate] Cannot write output file", output_file)
+								logger.Errorln("[dSlate] Cannot write output file", output_file)
 								break
 							} else {
-								log.Println("[dSlate] Successfully signed file. please check", output_file)
+								logger.Println("[dSlate] Successfully signed file. please check", output_file)
 							}
 
 							inc++
@@ -545,19 +544,19 @@ func nfaOpts() fyne.CanvasObject {
 						extension.Enable()
 						process_on = false
 						kill_process = false
-						log.Println("[dSlate] Sign loop complete")
+						logger.Println("[dSlate] Sign loop complete")
 
 					} else {
-						log.Println("[dSlate] Loop already running")
+						logger.Println("[dSlate] Loop already running")
 					}
 
 					wf.Close_Encrypted_Wallet()
 				}()
 			} else {
-				log.Println("[dSlate] Wallet", err)
+				logger.Errorln("[dSlate] Wallet", err)
 			}
 		} else {
-			log.Println("[dSlate] Sign entries not valid")
+			logger.Println("[dSlate] Sign entries not valid")
 		}
 	})
 

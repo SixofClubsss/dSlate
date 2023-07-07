@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"log"
 
 	"github.com/dReam-dApps/dReams/rpc"
 )
@@ -25,12 +24,12 @@ func whichDaemon(s string) {
 func isDaemonConnected() {
 	if rpc.Daemon.Connect {
 		if !daemonCheckBox.Checked {
-			log.Println("[dSlate] Daemon RPC Connected")
+			logger.Println("[dSlate] Daemon RPC Connected")
 		}
 		daemonCheckBox.SetChecked(true)
 	} else {
 		if debug {
-			log.Println("[dSlate] Daemon RPC Not Connected")
+			logger.Println("[dSlate] Daemon RPC Not Connected")
 		}
 		currentHeight.SetText("Height:")
 		if daemonCheckBox.Checked {
@@ -44,14 +43,14 @@ func isDaemonConnected() {
 func isWalletConnected() {
 	if rpc.Wallet.Connect {
 		if !walletCheckBox.Checked {
-			log.Println("[dSlate] Wallet RPC Connected")
+			logger.Println("[dSlate] Wallet RPC Connected")
 			walletCheckBox.SetChecked(true)
 		}
 		GetBalance()
 
 	} else {
 		if debug {
-			log.Println("[dSlate] Wallet RPC Not Connected")
+			logger.Println("[dSlate] Wallet RPC Not Connected")
 		}
 		if walletCheckBox.Checked {
 			walletCheckBox.SetChecked(false)

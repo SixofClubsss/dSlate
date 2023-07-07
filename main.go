@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"image/color"
-	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -32,6 +32,7 @@ var (
 )
 
 func main() {
+	menu.InitLogrusLog(runtime.GOOS == "windows")
 	myApp.Settings().SetTheme(bundle.DeroTheme(color.Black))
 	myWindow = myApp.NewWindow("dSlate") /// start main app
 	myWindow.SetMaster()                 /// if main closes, all windows close
@@ -54,6 +55,7 @@ func main() {
 // Handle ctrl-c close
 func init() {
 	menu.Gnomes.Fast = true
+	menu.Gnomes.DBType = "boltdb"
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -77,11 +79,10 @@ func fetchLoop() {
 				isDaemonConnected()
 				isWalletConnected()
 				GetHeight()
-				if menu.Gnomes.Init {
-					menu.Gnomes.Indexer.Endpoint = rpc.Daemon.Rpc
-				}
+				menu.GnomonEndPoint()
+
 			case <-quit: /// exit loop
-				log.Println("[dSlate] Exiting...")
+				logger.Println("[dSlate] Exiting...")
 				ticker.Stop()
 				return
 			}

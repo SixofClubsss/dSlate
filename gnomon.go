@@ -1,11 +1,14 @@
 package main
 
 import (
-	"log"
 	"strconv"
 
+	"github.com/civilware/Gnomon/structures"
 	"github.com/dReam-dApps/dReams/menu"
+	"github.com/sirupsen/logrus"
 )
+
+var logger = structures.Logger.WithFields(logrus.Fields{})
 
 func searchByKey(scid string, key string, s bool) string {
 	if menu.Gnomes.Init {
@@ -16,7 +19,7 @@ func searchByKey(scid string, key string, s bool) string {
 			sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, key)
 		} else {
 			if i, err := strconv.Atoi(key); err != nil {
-				log.Println("[dSlate]", err)
+				logger.Errorln("[dSlate]", err)
 			} else {
 				sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, uint64(i))
 			}
@@ -42,7 +45,7 @@ func searchByValue(scid string, value string, s bool) string {
 			sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, value)
 		} else {
 			if i, err := strconv.Atoi(value); err != nil {
-				log.Println("[dSlate]", err)
+				logger.Errorln("[dSlate]", err)
 			} else {
 				sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, uint64(i))
 			}

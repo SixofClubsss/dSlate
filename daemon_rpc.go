@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 
@@ -39,7 +38,7 @@ func getSC(p *dero.GetSC_Params) {
 
 	var result *dero.GetSC_Result
 	if err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", p); err != nil {
-		log.Println("[getSC]", err)
+		logger.Errorln("[getSC]", err)
 		return
 	}
 
@@ -68,7 +67,7 @@ func getSCcode(scid string) {
 	}
 
 	if err := rpcClientD.CallFor(ctx, &result, "DERO.GetSC", params); err != nil {
-		log.Println("[getSCcode]", err)
+		logger.Errorln("[getSCcode]", err)
 		return
 	}
 
