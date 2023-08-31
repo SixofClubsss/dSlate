@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/dReam-dApps/dReams/bundle"
 	"github.com/dReam-dApps/dReams/menu"
 	"github.com/dReam-dApps/dReams/rpc"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,7 +32,7 @@ var (
 )
 
 func main() {
-	menu.InitLogrusLog(runtime.GOOS == "windows")
+	menu.InitLogrusLog(logrus.InfoLevel)
 	myApp.Settings().SetTheme(bundle.DeroTheme(color.Black))
 	myWindow = myApp.NewWindow("dSlate") /// start main app
 	myWindow.SetMaster()                 /// if main closes, all windows close
