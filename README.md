@@ -18,6 +18,6 @@ Check out [Fyne's developer guide](https://developer.fyne.io/) and have some fun
 ---
 
 ### Licensing
-dSlate is free and open source.     
+secret-slate is free and open source.     
 The source code is published under the [MIT](https://github.com/SixofClubsss/dSlate/blob/main/LICENSE) License.     
 Copyright © 2023 SixofClubs     
