@@ -19,5 +19,5 @@ Check out [Fyne's developer guide](https://developer.fyne.io/) and have some fun
 
 ### Licensing
 secret-slate is free and open source.     
-The source code is published under the [MIT](https://github.com/SixofClubsss/dSlate/blob/main/LICENSE) License.     
-Copyright © 2023 SixofClubs     
+The source code is published under the [MIT](https://github.com/secretnamebasis/secret-slate/blob/main/LICENSE) License.     
+Copyright © 2023 secret-slate     
