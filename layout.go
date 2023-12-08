@@ -40,53 +40,78 @@ func placeWithout() *container.AppTabs {
 // Organize content with layout
 func placeWith() *container.AppTabs {
 
-	wallet := container.NewBorder(
-		nil,
-		nil,
-		nil,
+	walletSelect := container.NewVBox(
+		rpcWalletEdit(),
+		rpcLoginEdit())
+
+	walletConnect := container.NewVBox(
 		rpcConnectButton(),
-		rpcWalletEdit())
+	)
 
-	checks := container.NewHBox(
-		daemonConnectBox(),
-		walletConnectBox())
+	wallet := container.NewVBox(
+		walletSelect,
+		walletConnect,
+	)
 
-	grid := container.NewAdaptiveGrid(2,
-		heightDisplay(),
-		balanceDisplay())
-
-	hbox := container.NewAdaptiveGrid(2,
+	box1 := container.NewVBox(
 		daemonSelectOption(),
+		heightDisplay())
+
+	box2 := container.NewVBox(
+		daemonConnectBox(),
+		walletConnectBox(),
 		debugEnabled)
 
-	vbox := container.NewVBox(hbox, grid, checks, rpcLoginEdit(), wallet)
-
-	settings_content := container.NewBorder(
-		nil,
-		vbox,
-		nil,
-		nil,
+	box3 := container.NewVBox(
 		layout.NewSpacer(),
-		container.NewCenter(container.NewMax(builtOnImage())))
-
-	search_content := container.NewVBox(
-		contractEdit(),
-		searchButton(),
+		wallet,
+		box1,
+		box2,
 		layout.NewSpacer(),
-		contractCode(),
+	)
+	box4 := container.NewHBox(
 		layout.NewSpacer(),
-		enableGnomon(),
-		gnomonOpts())
+		box3,
+		layout.NewSpacer(),
+	)
 
-	scroll := container.NewScroll(search_content)
-	imageContent := container.NewWithoutLayout(cardImage())
+	box5 := container.NewVBox(
+		layout.NewSpacer(),
+		builtOnImage(),
+		container.NewGridWithColumns(3,
+			layout.NewSpacer(),
+			balanceDisplay(),
+			layout.NewSpacer(),
+		),
+		cardImage(),
+
+		layout.NewSpacer())
+
+	// box6 := container.NewHBox(
+	// 	layout.NewSpacer(),
+	// 	box5,
+	// 	layout.NewSpacer(),
+	// )
+	// search_content := container.NewVBox(
+	// 	contractEdit(),
+	// 	searchButton(),
+	// 	layout.NewSpacer(),
+	// 	contractCode(),
+	//
+	// 	enableGnomon(),
+	// 	gnomonOpts())
+
+	// scroll := container.NewScroll(search_content)
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("Settings", settings_content),
-		container.NewTabItem("Search", scroll),
-		container.NewTabItem("Blank Slate", blankWidget()),
-		container.NewTabItem("?", imageContent),
-		container.NewTabItem("NFA", nfaOpts()),
+		container.NewTabItem("DERO Bags", box5),
+		container.NewTabItem("Settings", box4),
+		// container.NewTabItem("DERO Address", imageContent),
+		// container.NewTabItem("Blank Slate", blankWidget()),
+
+		//	container.NewTabItem("Search", scroll),
+
+	//	container.NewTabItem("NFA", nfaOpts()),
 	)
 
 	tabs.SetTabLocation(container.TabLocationTop)
