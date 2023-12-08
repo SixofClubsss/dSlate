@@ -10,7 +10,7 @@ import (
 // Pop up for entering custom daemon address
 func confirmPopUp() {
 	cw := fyne.CurrentApp().NewWindow("Enter Custom Address")
-	cw.SetIcon(resourceDReamTablesIconPng)
+	cw.SetIcon(resourceDerobotJpg)
 	cw.Resize(fyne.NewSize(380, 50))
 	cw.SetFixedSize(true)
 
@@ -21,7 +21,7 @@ func confirmPopUp() {
 		rpc.Daemon.Rpc = custom_input.Text
 		rpc.Ping()
 		if rpc.Daemon.IsConnected() {
-			logger.Println("[dSlate] Daemon Set To: CUSTOM")
+			logger.Println("[secret-slate] Daemon Set To: CUSTOM")
 			cw.Close()
 		}
 	})
@@ -40,7 +40,7 @@ func confirmPopUp() {
 // Pop up display for sc search results
 func searchPopUp(b, s, u, c string) {
 	sw := fyne.CurrentApp().NewWindow("Search Results")
-	sw.SetIcon(resourceDReamTablesIconPng)
+	sw.SetIcon(resourceDerobotJpg)
 	sw.Resize(fyne.NewSize(680, 800))
 	sw.SetFixedSize(true)
 

@@ -34,8 +34,8 @@ func GetAddress() {
 		rpc.Wallet.Connect = true
 		rpc.Wallet.Address = result.Address
 		walletCheckBox.SetChecked(true)
-		logger.Println("[dSlate] Wallet Connected")
-		logger.Println("[dSlate] Dero Address: " + result.Address)
+		logger.Println("[secret-slate] Wallet Connected")
+		logger.Println("[secret-slate] Dero Address: " + result.Address)
 		passHash = sha256.Sum256([]byte(rpc.Wallet.UserPass))
 	}
 }

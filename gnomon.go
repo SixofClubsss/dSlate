@@ -19,7 +19,7 @@ func searchByKey(scid string, key string, s bool) string {
 			sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, key)
 		} else {
 			if i, err := strconv.Atoi(key); err != nil {
-				logger.Errorln("[dSlate]", err)
+				logger.Errorln("[secret-slate]", err)
 			} else {
 				sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, uint64(i))
 			}
@@ -45,7 +45,7 @@ func searchByValue(scid string, value string, s bool) string {
 			sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, value)
 		} else {
 			if i, err := strconv.Atoi(value); err != nil {
-				logger.Errorln("[dSlate]", err)
+				logger.Errorln("[secret-slate]", err)
 			} else {
 				sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, uint64(i))
 			}
