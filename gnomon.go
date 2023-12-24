@@ -4,24 +4,28 @@ import (
 	"strconv"
 
 	"github.com/civilware/Gnomon/structures"
-	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/sirupsen/logrus"
 )
 
+// Log output to stdout
 var logger = structures.Logger.WithFields(logrus.Fields{})
 
+// Gnomon instance for dSlate
+var gnomon = gnomes.NewGnomes()
+
 func searchByKey(scid string, key string, s bool) string {
-	if menu.Gnomes.Init {
+	if gnomon.IsInitialized() {
 		var sValue []string
 		var uValue []uint64
 
 		if s {
-			sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, key)
+			sValue, uValue = gnomon.GetSCIDValuesByKey(scid, key)
 		} else {
 			if i, err := strconv.Atoi(key); err != nil {
 				logger.Errorln("[dSlate]", err)
 			} else {
-				sValue, uValue = menu.Gnomes.GetSCIDValuesByKey(scid, uint64(i))
+				sValue, uValue = gnomon.GetSCIDValuesByKey(scid, uint64(i))
 			}
 		}
 
@@ -38,16 +42,16 @@ func searchByKey(scid string, key string, s bool) string {
 }
 
 func searchByValue(scid string, value string, s bool) string {
-	if menu.Gnomes.Init {
+	if gnomon.IsInitialized() {
 		var sValue []string
 		var uValue []uint64
 		if s {
-			sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, value)
+			sValue, uValue = gnomon.GetSCIDKeysByValue(scid, value)
 		} else {
 			if i, err := strconv.Atoi(value); err != nil {
 				logger.Errorln("[dSlate]", err)
 			} else {
-				sValue, uValue = menu.Gnomes.GetSCIDKeysByValue(scid, uint64(i))
+				sValue, uValue = gnomon.GetSCIDKeysByValue(scid, uint64(i))
 			}
 		}
 

@@ -17,7 +17,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dReam-dApps/dReams/dwidget"
-	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/rpc"
 	dero "github.com/deroproject/derohe/rpc"
 	"github.com/deroproject/derohe/walletapi"
@@ -36,7 +36,7 @@ var (
 	contractInput  = widget.NewMultiLineEntry()
 
 	daemonCheckBox = widget.NewCheck("Daemon Connected", func(value bool) {
-		menu.Gnomes.Stop("dSlate")
+		gnomon.Stop("dSlate")
 	})
 
 	walletCheckBox = widget.NewCheck("Wallet Connected", func(value bool) {
@@ -209,12 +209,12 @@ func enableGnomon() fyne.CanvasObject {
 		switch s {
 		case "On":
 			if rpc.Daemon.Connect {
-				go menu.StartGnomon("dSlate", "boltdb", []string{}, 0, 0, nil)
+				go gnomes.StartGnomon("dSlate", "boltdb", []string{}, 0, 0, nil)
 			} else {
 				gnomonEnabled.SetSelected("Off")
 			}
 		case "Off":
-			menu.Gnomes.Stop("dSlate")
+			gnomon.Stop("dSlate")
 		default:
 		}
 	})
@@ -241,7 +241,7 @@ func gnomonOpts() fyne.CanvasObject {
 	soru.Horizontal = true
 
 	search := widget.NewButton("Search", func() {
-		if menu.Gnomes.Init {
+		if gnomon.IsInitialized() {
 			switch korv.Selected {
 			case "Key":
 				switch soru.Selected {

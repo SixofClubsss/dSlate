@@ -11,7 +11,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"github.com/dReam-dApps/dReams/bundle"
-	"github.com/dReam-dApps/dReams/menu"
+	"github.com/dReam-dApps/dReams/gnomes"
 	"github.com/dReam-dApps/dReams/rpc"
 	"github.com/sirupsen/logrus"
 )
@@ -32,7 +32,7 @@ var (
 )
 
 func main() {
-	menu.InitLogrusLog(logrus.InfoLevel)
+	gnomes.InitLogrusLog(logrus.InfoLevel)
 	myApp.Settings().SetTheme(bundle.DeroTheme(color.Black))
 	myWindow = myApp.NewWindow("dSlate") /// start main app
 	myWindow.SetMaster()                 /// if main closes, all windows close
@@ -54,8 +54,8 @@ func main() {
 
 // Handle ctrl-c close
 func init() {
-	menu.Gnomes.Fast = true
-	menu.Gnomes.DBType = "boltdb"
+	gnomon.SetFastsync(true, true, 10000)
+	gnomon.SetDBStorageType("boltdb")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -79,7 +79,7 @@ func fetchLoop() {
 				isDaemonConnected()
 				isWalletConnected()
 				GetHeight()
-				menu.GnomonEndPoint()
+				gnomes.EndPoint()
 
 			case <-quit: /// exit loop
 				logger.Println("[dSlate] Exiting...")
@@ -90,6 +90,7 @@ func fetchLoop() {
 	}()
 }
 
-func stopLoop() { /// to exit loop
+// To exit the routine running from fetchLoop()
+func stopLoop() {
 	quit <- struct{}{}
 }
