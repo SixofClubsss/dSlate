@@ -1,17 +1,17 @@
 module github.com/SixofClubsss/dSlate
 
-go 1.20
+go 1.21.5
 
 require (
-	fyne.io/fyne/v2 v2.4.1
-	github.com/civilware/Gnomon v0.0.0-20231218151558-0ee387e75195
-	github.com/dReam-dApps/dReams v0.11.0
+	fyne.io/fyne/v2 v2.4.4-0.20231224124904-a09bbd790b98
+	github.com/civilware/Gnomon v0.0.0-20240102201536-a5900d5a61da
+	github.com/dReam-dApps/dReams v0.11.1
 	github.com/deroproject/derohe v0.0.0-20230604143809-765b2db1f482
 	github.com/sirupsen/logrus v1.9.3
 )
 
 require (
-	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
+	fyne.io/systray v1.10.1-0.20231115130155-104f5ef7839e // indirect
 	fyne.io/x/fyne v0.0.0-20230527115803-2bc5e346c12d // indirect
 	github.com/VictoriaMetrics/metrics v1.24.0 // indirect
 	github.com/beevik/ntp v1.1.1 // indirect

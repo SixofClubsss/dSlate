@@ -41,12 +41,12 @@ func main() {
 	myWindow.SetIcon(resourceDReamTablesIconPng)
 	myWindow.SetCloseIntercept(func() { /// do when close
 		kill_process = true
-		stopLoop()
+		exit()
 		myWindow.Close()
 	})
 
 	/// start looking and set content
-	fetchLoop()
+	fetch()
 	myWindow.SetContent(placeWith())
 	myWindow.ShowAndRun()
 
@@ -61,14 +61,14 @@ func init() {
 	go func() {
 		<-c
 		kill_process = true
-		stopLoop()
+		exit()
 		fmt.Println()
 		os.Exit(1)
 	}()
 }
 
 // Main loop, ping daemon, get height check connection status and update Gnomon endpoint
-func fetchLoop() {
+func fetch() {
 	var ticker = time.NewTicker(6 * time.Second)
 	quit = make(chan struct{})
 	go func() {
@@ -90,7 +90,7 @@ func fetchLoop() {
 	}()
 }
 
-// To exit the routine running from fetchLoop()
-func stopLoop() {
+// To exit the routine running from fetch()
+func exit() {
 	quit <- struct{}{}
 }

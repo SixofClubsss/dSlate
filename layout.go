@@ -20,7 +20,7 @@ func placeWithout() *container.AppTabs {
 
 	search_content := container.NewWithoutLayout(
 		searchButton(),
-		contractEdit())
+		contractEntry())
 
 	scroll := container.NewScroll(search_content)
 	image_content := container.NewWithoutLayout(cardImage())
@@ -67,13 +67,15 @@ func placeWith() *container.AppTabs {
 		nil,
 		nil,
 		layout.NewSpacer(),
-		container.NewCenter(container.NewMax(builtOnImage())))
+		container.NewCenter(container.NewStack(builtOnImage())))
 
 	search_content := container.NewVBox(
-		contractEdit(),
+		contractEntry(),
 		searchButton(),
 		layout.NewSpacer(),
-		contractCode(),
+		codeButton(),
+		layout.NewSpacer(),
+		updateButton(),
 		layout.NewSpacer(),
 		enableGnomon(),
 		gnomonOpts())

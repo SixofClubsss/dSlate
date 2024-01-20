@@ -4,6 +4,7 @@ import (
 	"errors"
 	"image/color"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -139,7 +140,7 @@ func balanceDisplay() fyne.Widget {
 }
 
 // SC entry
-func contractEdit() fyne.Widget {
+func contractEntry() fyne.Widget {
 	contractInput.SetPlaceHolder("Enter Contract Id:")
 	contractInput.Resize(fyne.NewSize(360, 45))
 	contractInput.Move(fyne.NewPos(10, 15))
@@ -149,7 +150,7 @@ func contractEdit() fyne.Widget {
 }
 
 // Print SC code button
-func contractCode() fyne.Widget {
+func codeButton() fyne.Widget {
 	button := widget.NewButton("SC Code", func() {
 		if len(contractInput.Text) == 64 {
 			getSCcode(contractInput.Text)
@@ -301,11 +302,6 @@ func nfaOpts() fyne.CanvasObject {
 	limit.SetPlaceHolder("Ending at #:")
 	limit.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
 
-	fee := dwidget.NewDeroEntry("", 1, 0)
-	fee.ExtendBaseWidget(fee)
-	fee.SetPlaceHolder("Fee:")
-	fee.Validator = validation.NewRegexp(`^\d{1,}`, "Format Not Valid")
-
 	stop := widget.NewButton("Stop Loop", func() {
 		logger.Println("[dSlate] Stopping install loop")
 		label.Text = "Stopping install loop..."
@@ -325,7 +321,7 @@ func nfaOpts() fyne.CanvasObject {
 			}
 
 			go func() {
-				if fee.Validate() == nil && limit.Validate() == nil && start.Validate() == nil {
+				if limit.Validate() == nil && start.Validate() == nil {
 					if !process_on {
 						process_on = true
 						install.Hide()
@@ -333,7 +329,6 @@ func nfaOpts() fyne.CanvasObject {
 						file_name.Disable()
 						start.Disable()
 						limit.Disable()
-						fee.Disable()
 						extension.Disable()
 
 						name := file_name.Text
@@ -400,7 +395,6 @@ func nfaOpts() fyne.CanvasObject {
 						file_name.Enable()
 						start.Enable()
 						limit.Enable()
-						fee.Enable()
 						extension.Enable()
 						process_on = false
 						kill_process = false
@@ -415,30 +409,6 @@ func nfaOpts() fyne.CanvasObject {
 				}
 			}()
 		}
-	})
-
-	update := widget.NewButton("Update Contract", func() {
-		path := file_name.Text
-		if _, err := os.Stat(path); err == nil {
-			logger.Println("[dSlate] Update Path", path)
-			file, err := os.ReadFile(path)
-
-			if err != nil {
-				logger.Errorln("[dSlate]", err)
-				return
-			}
-			code := string(file)
-			if code != "" {
-				fe := rpc.StringToInt(fee.Text)
-				updateContract(contractInput.Text, string(file), uint64(fe))
-			} else {
-				logger.Errorln("[dSlate] Failed to update, code is empty string")
-			}
-
-		} else if errors.Is(err, os.ErrNotExist) {
-			logger.Errorln("[dSlate]", path, "Not Found")
-		}
-
 	})
 
 	stop.Hide()
@@ -483,7 +453,6 @@ func nfaOpts() fyne.CanvasObject {
 						file_name.Disable()
 						start.Disable()
 						limit.Disable()
-						fee.Disable()
 						extension.Disable()
 
 						ext := extension.Selected
@@ -540,7 +509,6 @@ func nfaOpts() fyne.CanvasObject {
 						file_name.Enable()
 						start.Enable()
 						limit.Enable()
-						fee.Enable()
 						extension.Enable()
 						process_on = false
 						kill_process = false
@@ -573,9 +541,42 @@ func nfaOpts() fyne.CanvasObject {
 		start,
 		limit,
 		layout.NewSpacer(),
-		fee,
 		install,
 		stop,
-		layout.NewSpacer(),
-		update)
+		layout.NewSpacer())
+}
+
+// Update button with select populated by .bas files in working directory
+func updateButton() fyne.CanvasObject {
+	files, err := filepath.Glob("*.bas")
+	if err != nil {
+		logger.Errorln("[dSlate] Update files", err)
+		files = []string{}
+	}
+
+	opts := widget.NewSelect(files, nil)
+
+	update := widget.NewButton("Update Contract", func() {
+		path := opts.Selected
+		if _, err := os.Stat(path); err == nil {
+			logger.Println("[dSlate] Update Path", path)
+			file, err := os.ReadFile(path)
+			if err != nil {
+				logger.Errorln("[dSlate]", err)
+				return
+			}
+			code := string(file)
+			if code != "" {
+				updateContract(contractInput.Text, string(file))
+			} else {
+				logger.Errorln("[dSlate] Failed to update, code is empty string")
+			}
+
+		} else if errors.Is(err, os.ErrNotExist) {
+			logger.Errorln("[dSlate]", path, "Not Found")
+		}
+
+	})
+
+	return container.NewVBox(opts, update)
 }

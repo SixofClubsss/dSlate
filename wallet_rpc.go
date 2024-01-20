@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"strconv"
 
+	"fyne.io/fyne/v2/dialog"
 	"github.com/dReam-dApps/dReams/rpc"
 	dero "github.com/deroproject/derohe/rpc"
 )
@@ -58,10 +60,7 @@ func GetBalance() {
 }
 
 // Update existing contracts with 'UpdateCode' entrypoint
-func updateContract(scid, code string, fee uint64) (tx string) {
-	rpcClientW, ctx, cancel := rpc.SetWalletClient(rpc.Wallet.Rpc, rpc.Wallet.UserPass)
-	defer cancel()
-
+func updateContract(scid, code string) (tx string) {
 	arg1 := dero.Argument{Name: "entrypoint", DataType: "S", Value: "UpdateCode"}
 	arg2 := dero.Argument{Name: "code", DataType: "S", Value: code}
 	args := dero.Arguments{arg1, arg2}
@@ -86,20 +85,30 @@ func updateContract(scid, code string, fee uint64) (tx string) {
 	}
 
 	t := []dero.Transfer{t1}
-	params := &dero.Transfer_Params{
-		Transfers: t,
-		SC_ID:     scid,
-		SC_RPC:    args,
-		Ringsize:  2,
-		Fees:      fee,
-	}
+	fee := rpc.GasEstimate(scid, "[dSlate]", args, t, 300000)
+	dialog.NewConfirm("Update Contract", fmt.Sprintf("%s gas fee to update scid", rpc.FromAtomic(fee, 5)), func(b bool) {
+		if b {
+			params := &dero.Transfer_Params{
+				Transfers: t,
+				SC_ID:     scid,
+				SC_RPC:    args,
+				Ringsize:  2,
+				Fees:      fee,
+			}
 
-	if err := rpcClientW.CallFor(ctx, &txid, "transfer", params); err != nil {
-		logger.Errorln("[updateContract]", err)
-		return
-	}
+			rpcClientW, ctx, cancel := rpc.SetWalletClient(rpc.Wallet.Rpc, rpc.Wallet.UserPass)
+			defer cancel()
 
-	logger.Println("[updateContract] Update TX:", txid)
+			if err := rpcClientW.CallFor(ctx, &txid, "transfer", params); err != nil {
+				logger.Errorln("[updateContract]", err)
+				return
+			}
+
+			logger.Println("[updateContract] Update TX:", txid)
+
+			tx = txid.TXID
+		}
+	}, myWindow).Show()
 
 	return
 }
